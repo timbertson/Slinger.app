@@ -1,0 +1,3 @@
+[submodule "Carthage/Checkouts/AXSwift"]
+	path = Carthage/Checkouts/AXSwift
+	url = https://github.com/tmandry/AXSwift.git
