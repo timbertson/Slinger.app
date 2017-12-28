@@ -9,9 +9,20 @@ class WindowRef : NSObject {
     }
 }
 
+@objc protocol ActorExport : JSExport {
+    set_position(_ x: NSNumber, _ y: NSNumber)
+}
+
+class Actor : NSObject, ActorExport {
+    init(win: NSWindow)
+}
+
 @objc protocol SystemExport: JSExport {
-    func active_window() -> WindowRef?
-    func rect_of_window(_ w: WindowRef) -> Rect?
+    func currentWindow() -> WindowRef?
+    func actorOfWin(win: WindowRef) -> Actor
+    func windowRect(_ w: WindowRef) -> Rect?
+    func workspaceRect() -> Rect?
+    func workspaceOrigin() -> Point
 }
 
 class Point: NSObject {
@@ -43,13 +54,35 @@ class Rect: NSObject {
     }
 }
 
+@discardableResult
+func logException<T>(desc: String, _ block: () throws -> T) -> T? {
+    do {
+        return try block()
+    } catch let error {
+        NSLog("Exception thrown in `\(desc): \(error)")
+        return nil
+    }
+}
+
+func logExceptionOpt<T>(desc: String, _ block: () throws -> T?) -> T? {
+    do {
+        return try block()
+    } catch let error {
+        NSLog("Exception thrown in `\(desc): \(error)")
+        return nil
+    }
+}
+
 class ExtensionSystem: NSObject, SystemExport {
-    func active_window() -> WindowRef? {
+    func currentWindow() -> WindowRef? {
         if let application = NSWorkspace.shared.frontmostApplication {
             let uiApp = Application(application)!
-            if let wins = try! uiApp.windows() {
-                if let frontmost = wins.first(where: {win in try! win.attribute(.main) ?? false}) {
-                return WindowRef.init(frontmost)
+            if let wins = logExceptionOpt(desc: "uiApp.windows()", { try uiApp.windows() }) {
+                let frontmostOpt = logExceptionOpt(desc: "frontmost", {
+                    try wins.first(where: {win in try win.attribute(.main) ?? false})
+                })
+                if let frontmost = frontmostOpt {
+                    return WindowRef.init(frontmost)
                 }
             }
             
@@ -67,13 +100,8 @@ class ExtensionSystem: NSObject, SystemExport {
         return nil
     }
     
-    func rect_of_window(_ w: WindowRef) -> Rect? {
-//        NSLog("Getting frame for: \(w.win)")
-//        NSLog(try! w.win.attribute(.position) ?? "nil")
-//        NSLog(try! w.win.attribute(.size) ?? "nil")
-//        NSLog(try! w.win.attribute(.window) ?? "nil")
-//        NSLog(try! w.win.attribute(.value) ?? "nil")
-        let frame: NSValue? = try! w.win.attribute(.frame)
+    func windowRect(_ w: WindowRef) -> Rect? {
+        let frame: NSValue? = logExceptionOpt(desc: "frame") { try w.win.attribute(.frame) }
         return frame.map { rect in Rect.ofNS(rect.rectValue) }
     }
 }
@@ -94,6 +122,7 @@ class Slinger {
     private var ext: JSValue
     private let ctx: JSContext
     private var jsError: JSValue?
+    private var window: NSWindow?
 
     private func captureJSError(_ result: JSValue?) throws -> JSValue {
         if let error = jsError {
@@ -113,7 +142,7 @@ class Slinger {
         return try captureJSError(obj.invokeMethod(fn, withArguments: arguments))
     }
     
-    init() {
+    init() throws {
         let vm = JSVirtualMachine()
         ctx = JSContext(virtualMachine: vm)!
         ext = JSValue.init(nullIn: ctx)
@@ -132,15 +161,34 @@ class Slinger {
         ctx.setObject(log, forKeyedSubscript: "log" as NSString)
         
         let path = Bundle.main.path(forResource: "cocoa_impl", ofType: "js")!
-        let source = try! String(contentsOfFile: path, encoding: String.Encoding.utf8)
+        let source = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
 
         ctx.evaluateScript(source)
-        ext = try! callJS(ctx.objectForKeyedSubscript("makeExtension"), arguments: [system])
+        ext = try callJS(ctx.objectForKeyedSubscript("makeExtension"), arguments: [system])
         NSLog("Slinger initialized: \(String(describing: ext))")
     }
     
+    func hide() {
+        if let window = self.window {
+            window.close()
+            self.window = nil
+        }
+    }
+    
     func show() {
-        NSLog("Calling show_ui!")
-        try! callJSMethod(ext, fn: "show_ui", arguments: [])
+        hide()
+        if let workspaceRect = NSScreen.main?.visibleFrame {
+            let window = NSWindow.init(contentRect: workspaceRect, styleMask: [.borderless], backing: .buffered, defer: false)
+            window.isOpaque = false
+            window.backgroundColor = NSColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
+            window.makeKeyAndOrderFront(self)
+            self.window = window // prevent GC
+        } else {
+            NSLog("unable to get main screen dimensions")
+        }
+        
+        logException(desc: "show") {
+            try callJSMethod(ext, fn: "show_ui", arguments: [])
+        }
     }
 }

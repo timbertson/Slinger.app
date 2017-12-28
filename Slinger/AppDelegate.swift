@@ -16,7 +16,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
             return
         }
         
-        let slinger = Slinger.init()
+        let slinger = try! Slinger.init()
         
         let defaultsKey = "shortcut-slinger-show"
         
