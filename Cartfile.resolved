@@ -1,1 +1,3 @@
+github "PureSwift/Cairo" "1.2.3"
+github "shpakovski/MASShortcut" "2.3.6"
 github "tmandry/AXSwift" "0.2.0"

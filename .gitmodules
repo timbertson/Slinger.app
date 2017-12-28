@@ -1,3 +1,15 @@
 [submodule "Carthage/Checkouts/AXSwift"]
 	path = Carthage/Checkouts/AXSwift
 	url = https://github.com/tmandry/AXSwift.git
+[submodule "Carthage/Checkouts/MASShortcut"]
+	path = Carthage/Checkouts/MASShortcut
+	url = https://github.com/shpakovski/MASShortcut.git
+[submodule "slinger-js"]
+	path = slinger-js
+	url = https://github.com/timbertson/slinger.git
+[submodule "Carthage/Checkouts/Cairo"]
+	path = Carthage/Checkouts/Cairo
+	url = https://github.com/PureSwift/Cairo.git
+[submodule "Carthage/Checkouts/SwiftCairo"]
+	path = Carthage/Checkouts/SwiftCairo
+	url = https://github.com/rhx/SwiftCairo.git

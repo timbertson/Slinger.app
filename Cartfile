@@ -1,4 +1,6 @@
 github "https://github.com/tmandry/AXSwift"
+github "https://github.com/shpakovski/MASShortcut"
 #git "/Users/tcuthbertson/Code/scratch/slinger/Bullshit" "master"
 #github https://github.com/tmandry/Swindler
-#github https://github.com/PureSwift/Cairo
+github "https://github.com/PureSwift/Cairo"
+#github "https://github.com/rhx/SwiftCairo"
