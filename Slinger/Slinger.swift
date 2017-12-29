@@ -1,6 +1,7 @@
 import Cocoa
 import JavaScriptCore
 import ApplicationServices
+import AXSwift
 
 class WindowRef : NSObject {
     let win: UIElement
@@ -10,16 +11,12 @@ class WindowRef : NSObject {
 }
 
 @objc protocol ActorExport : JSExport {
-    set_position(_ x: NSNumber, _ y: NSNumber)
-}
-
-class Actor : NSObject, ActorExport {
-    init(win: NSWindow)
+    func set_position(_ x: NSNumber, _ y: NSNumber) -> ()
 }
 
 @objc protocol SystemExport: JSExport {
     func currentWindow() -> WindowRef?
-    func actorOfWin(win: WindowRef) -> Actor
+//    func actorOfWin(win: WindowRef) -> Actor
     func windowRect(_ w: WindowRef) -> Rect?
     func workspaceRect() -> Rect?
     func workspaceOrigin() -> Point
@@ -74,6 +71,16 @@ func logExceptionOpt<T>(desc: String, _ block: () throws -> T?) -> T? {
 }
 
 class ExtensionSystem: NSObject, SystemExport {
+    func workspaceRect() -> Rect? {
+        //TODO
+        return nil
+    }
+    
+    func workspaceOrigin() -> Point {
+        // TODO
+        return Point.init(x: 0, y: 0)
+    }
+    
     func currentWindow() -> WindowRef? {
         if let application = NSWorkspace.shared.frontmostApplication {
             let uiApp = Application(application)!

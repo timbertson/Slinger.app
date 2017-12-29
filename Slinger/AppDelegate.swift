@@ -1,7 +1,7 @@
 import Cocoa
 import ApplicationServices
 import MASShortcut
-//import AXSwift
+import AXSwift
 
 class ApplicationDelegate: NSObject, NSApplicationDelegate {
     

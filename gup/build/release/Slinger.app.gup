@@ -1,0 +1,5 @@
+#!bash -eu
+cd ../../
+gup -u slinger-js/extension/cocoa_impl.js
+xcodebuild -project Slinger.xcodeproj
+gup --leave
