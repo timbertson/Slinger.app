@@ -18,65 +18,64 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
         
         let slinger = try! Slinger.init()
         
-        let defaultsKey = "shortcut-slinger-show"
-        
         let keycodeMap = Keybinding.constructKeyCodeMap()
-        let flags: NSEvent.ModifierFlags = [ .control, .shift ]
         MASShortcutValidator.shared().allowAnyShortcutWithOptionModifier = true
-
-        if let keycodes = keycodeMap["a"], !keycodes.isEmpty {
-            let shortcut = MASShortcut(keyCode: UInt(keycodes[0]), modifierFlags: flags.rawValue)
-            MASShortcutBinder.shared().registerDefaultShortcuts([ defaultsKey: shortcut as Any ])
-            MASShortcutBinder.shared().bindShortcut(withDefaultsKey: defaultsKey, toAction: {
-                NSLog("action!")
-                slinger.show()
-            })
+        
+        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, fn: @escaping (() -> ())) {
+            let prefKey = "shortcut-\(pref)"
+            if let keycodes = keycodeMap[key], !keycodes.isEmpty {
+                let shortcut = MASShortcut(keyCode: UInt(keycodes[0]), modifierFlags: modifiers.rawValue)
+                MASShortcutBinder.shared().registerDefaultShortcuts([ prefKey: shortcut as Any ])
+                MASShortcutBinder.shared().bindShortcut(withDefaultsKey: prefKey, toAction: fn)
+            }
         }
         
-//        // Get Active Application
-//        if let application = NSWorkspace.shared.frontmostApplication {
-//            NSLog("localizedName: \(String(describing: application.localizedName)), processIdentifier: \(application.processIdentifier)")
-//            let uiApp = Application(application)!
-//            NSLog("try get windows...")
-//
-//            NSLog("windows: \(String(describing: try! uiApp.windows()))")
-//            NSLog("attributes: \(try! uiApp.attributes())")
-//            NSLog("at 0,0: \(String(describing: try! uiApp.elementAtPosition(0, 0)))")
-//            if let bundleIdentifier = application.bundleIdentifier {
-//                NSLog("bundleIdentifier: \(bundleIdentifier)")
-//                let windows = try! Application.allForBundleID(bundleIdentifier).first!.windows()
-//                NSLog("windows: \(String(describing: windows))")
-//            }
-//        }
-//
-//        // Get Application by bundleIdentifier
-//        let app = Application.allForBundleID("com.apple.finder").first!
-//        NSLog("finder: \(app)")
-//        NSLog("role: \(try! app.role()!)")
-//        NSLog("windows: \(try! app.windows()!)")
-//        NSLog("attributes: \(try! app.attributes())")
-//        if let title: String = try! app.attribute(.title) {
-//            NSLog("title: \(title)")
-//        }
-//        NSLog("multi: \(try! app.getMultipleAttributes(["AXRole", "asdf", "AXTitle"]))")
-//        NSLog("multi: \(try! app.getMultipleAttributes(.role, .title))")
-//
-//        // Try to set an unsettable attribute
-//        if let window = try! app.windows()?.first {
-//            do {
-//                try window.setAttribute(.title, value: "my title")
-//                let newTitle: String = try! window.attribute(.title)!
-//                NSLog("title set; result = \(newTitle)")
-//            } catch {
-//                NSLog("error caught trying to set title of window: \(error)")
-//            }
-//        }
-//
-//        NSLog("system wide:")
-//        NSLog("role: \(try! systemWideElement.role()!)")
-////         NSLog("windows: \(try! sys.windows())")
-//        NSLog("attributes: \(try! systemWideElement.attributes())")
-//
-//        NSRunningApplication.current.terminate()
+        func bind(action: String, key: String, modifiers: NSEvent.ModifierFlags) {
+            bind(action, key: key, modifiers: modifiers) { slinger.action(action) }
+        }
+        
+        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, action: String, arguments: [Any]) {
+            bind(pref, key: key, modifiers: modifiers) { slinger.action(action, arguments: arguments) }
+        }
+
+        bind("show", key: "a", modifiers: [.option]) { slinger.show(self) }
+        bind("nextWindow", key: "j", modifiers: [.command], action: "selectWindow", arguments: [1])
+        bind("prevWindow", key: "k", modifiers: [.command], action: "selectWindow", arguments: [-1])
+        
+        bind("swapNextWindow", key: "j", modifiers: [.command, .shift], action: "swapWindow", arguments: [1])
+        bind("swapPrevWindow", key: "k", modifiers: [.command, .shift], action: "swapWindow", arguments: [-1])
+        
+        bind("moveRight", key: "l", modifiers: [.option], action: "moveAction", arguments: [1, "x"])
+        bind("moveLeft", key: "h", modifiers: [.option], action: "moveAction", arguments: [-1, "x"])
+        bind("moveUp", key: "i", modifiers: [.option], action: "moveAction", arguments: [-1, "y"])
+        bind("moveDown", key: "u", modifiers: [.option], action: "moveAction", arguments: [1, "y"])
+
+        bind("growHorizontal", key: "l", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "x"])
+        bind("shrinkHorizontal", key: "h", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "x"])
+        bind("growVertical", key: "i", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "y"])
+        bind("shrinkVertical", key: "u", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "y"])
+        
+        bind("grow", key: "=", modifiers: [.option], action: "resizeAction", arguments: [1, NSNull.init()])
+        bind("shrink", key: "-", modifiers: [.option], action: "resizeAction", arguments: [-1, NSNull.init()])
+
+        /*
+        Not implemented on OSX:
+        (requires private APIs and a CGWindowID, which itself requires private APIs to get)
+ 
+        bind("switchWorkspaceLeft", key: "-", modifiers: [.option, .command], action: "switchWorkspace", arguments: [-1])
+        bind("switchWorkspaceRight", key: "-", modifiers: [.option, .command], action: "switchWorkspace", arguments: [1])
+        
+        bind("moveWindowWorkspaceLeft", key: "-", modifiers: [.option, .command, .shift], action: "moveWindowWorkspace", arguments: [-1])
+        bind("moveWindowWorkspaceRight", key: "-", modifiers: [.option, .command, .shift], action: "moveWindowWorkspace", arguments: [1])
+        */
+        
+        bind(action: "toggleMaximize", key: "z", modifiers: [.option])
+        bind(action: "minimize", key: "x", modifiers: [.option])
+        bind(action: "unminimize", key: "x", modifiers: [.option, .shift])
+        
+        bind(action: "distribute", key: "8", modifiers: [.option, .shift])
+        
+        NSLog("Slinger initialized")
+        
     }
 }

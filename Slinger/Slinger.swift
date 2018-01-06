@@ -3,60 +3,20 @@ import JavaScriptCore
 import ApplicationServices
 import AXSwift
 
-class WindowRef : NSObject {
-    let win: UIElement
-    init(_ win: UIElement) {
-        self.win = win
-    }
-}
-
-@objc protocol ActorExport : JSExport {
-    func set_position(_ x: NSNumber, _ y: NSNumber) -> ()
-}
-
-@objc protocol SystemExport: JSExport {
-    func currentWindow() -> WindowRef?
-//    func actorOfWin(win: WindowRef) -> Actor
-    func windowRect(_ w: WindowRef) -> Rect?
-    func workspaceRect() -> Rect?
-    func workspaceOrigin() -> Point
-}
-
-class Point: NSObject {
-    let x: Float
-    let y: Float
-    init(x: Float, y: Float) {
-        self.x = x
-        self.y = y
-    }
-    
-    static func ofNS(point: NSPoint) -> Point {
-        return Point.init(x: Float(point.x), y: Float(point.y))
-    }
-
-    static func ofNS(size: NSSize) -> Point {
-        return Point.init(x: Float(size.width), y: Float(size.height))
-    }
-}
-
-class Rect: NSObject {
-    let pos: Point
-    let size: Point
-    init(pos: Point, size: Point) {
-        self.pos = pos
-        self.size = size
-    }
-    static func ofNS(_ r: NSRect) -> Rect {
-        return Rect.init(pos: Point.ofNS(point: r.origin), size: Point.ofNS(size: r.size))
-    }
-}
-
 @discardableResult
 func logException<T>(desc: String, _ block: () throws -> T) -> T? {
     do {
         return try block()
     } catch let error {
         NSLog("Exception thrown in `\(desc): \(error)")
+        return nil
+    }
+}
+
+func swallowException<T>(_ block: () throws -> T) -> T? {
+    do {
+        return try block()
+    } catch {
         return nil
     }
 }
@@ -70,48 +30,6 @@ func logExceptionOpt<T>(desc: String, _ block: () throws -> T?) -> T? {
     }
 }
 
-class ExtensionSystem: NSObject, SystemExport {
-    func workspaceRect() -> Rect? {
-        //TODO
-        return nil
-    }
-    
-    func workspaceOrigin() -> Point {
-        // TODO
-        return Point.init(x: 0, y: 0)
-    }
-    
-    func currentWindow() -> WindowRef? {
-        if let application = NSWorkspace.shared.frontmostApplication {
-            let uiApp = Application(application)!
-            if let wins = logExceptionOpt(desc: "uiApp.windows()", { try uiApp.windows() }) {
-                let frontmostOpt = logExceptionOpt(desc: "frontmost", {
-                    try wins.first(where: {win in try win.attribute(.main) ?? false})
-                })
-                if let frontmost = frontmostOpt {
-                    return WindowRef.init(frontmost)
-                }
-            }
-            
-//            if let win: AXUIElement = try! uiApp.attribute(.mainWindow) {
-//                print(try! UIElement.init(win).attribute(.role) ?? "(no role)")
-//                return WindowRef.init(UIElement.init(win))
-//            }
-
-// XXX .focusedWindow or mainWindow ought to do it, but returns an unknown type which isn't an AXUIElement...
-//            if let win: AXUIElement = try! uiApp.attribute(.focusedWindow) {
-//                print(try! UIElement.init(win).attribute(.role) ?? "(no role)")
-//                return WindowRef.init(UIElement.init(win))
-//            }
-        }
-        return nil
-    }
-    
-    func windowRect(_ w: WindowRef) -> Rect? {
-        let frame: NSValue? = logExceptionOpt(desc: "frame") { try w.win.attribute(.frame) }
-        return frame.map { rect in Rect.ofNS(rect.rectValue) }
-    }
-}
 
 struct RuntimeError: Error {
     let message: String
@@ -125,40 +43,22 @@ struct RuntimeError: Error {
     }
 }
 
+class SlingerWindow : NSWindow {
+    override var canBecomeKey: Bool { get { return true } }
+}
+
 class Slinger {
     private var ext: JSValue
+    private var windowActions: JSValue
     private let ctx: JSContext
-    private var jsError: JSValue?
+    private let Sys: CocoaSystem
     private var window: NSWindow?
 
-    private func captureJSError(_ result: JSValue?) throws -> JSValue {
-        if let error = jsError {
-            jsError = nil
-            throw RuntimeError.init(String(describing: error))
-        }
-        return result ?? JSValue.init(undefinedIn: ctx)
-    }
-    
-    @discardableResult
-    private func callJS(_ fn: JSValue, arguments: [Any]!) throws -> JSValue {
-        return try captureJSError(fn.call(withArguments: arguments))
-    }
-    
-    @discardableResult
-    private func callJSMethod(_ obj: JSValue, fn: String, arguments: [Any]!) throws -> JSValue {
-        return try captureJSError(obj.invokeMethod(fn, withArguments: arguments))
-    }
-    
     init() throws {
         let vm = JSVirtualMachine()
         ctx = JSContext(virtualMachine: vm)!
         ext = JSValue.init(nullIn: ctx)
-        ctx.exceptionHandler = { context, exception in
-            self.jsError = exception
-//            NSLog("JS Error: \(exception?.description ?? "unknown error")")
-        }
-        
-        let system = ExtensionSystem.init()
+        Sys = CocoaSystem.init(ctx)
         
         let log: @convention(block) (String) -> Void = { msg in
             NSLog(msg)
@@ -171,31 +71,82 @@ class Slinger {
         let source = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
 
         ctx.evaluateScript(source)
-        ext = try callJS(ctx.objectForKeyedSubscript("makeExtension"), arguments: [system])
-        NSLog("Slinger initialized: \(String(describing: ext))")
+        ext = try Sys.callJS(ctx.objectForKeyedSubscript("makeExtension"), arguments: [Sys as SystemExport])
+        windowActions = ext.objectForKeyedSubscript("actions")
     }
     
     func hide() {
+        NSLog("hiding")
         if let window = self.window {
             window.close()
             self.window = nil
         }
     }
     
-    func show() {
+    func show(_ appDelegate: NSApplicationDelegate) {
         hide()
-        if let workspaceRect = NSScreen.main?.visibleFrame {
-            let window = NSWindow.init(contentRect: workspaceRect, styleMask: [.borderless], backing: .buffered, defer: false)
-            window.isOpaque = false
-            window.backgroundColor = NSColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
-            window.makeKeyAndOrderFront(self)
-            self.window = window // prevent GC
-        } else {
-            NSLog("unable to get main screen dimensions")
+        NSLog("Showing")
+        
+        guard let screen = NSScreen.main else {
+            NSLog("unable to get main screen")
+            return
+        }
+        Sys.screen = screen
+        let origin = Point.ofNS(point: screen.invertYAxis(point: NSEvent.mouseLocation))
+        let contentView = ClutterView.init()
+        let parent = Actor.init(Sys: self.Sys, view: contentView)
+        let window = SlingerWindow.init(contentRect: screen.visibleFrame, styleMask: [.borderless], backing: .buffered, defer: false)
+        window.contentView = contentView
+        
+        let ui : JSValue? = logException(desc: "show") {
+            try Sys.callJSMethod(ext, fn: "show_ui", arguments: [parent, origin])
+        }?.nonNull()
+        guard let _ = ui?.toObject() else {
+            NSLog("no menu created")
+            return
         }
         
-        logException(desc: "show") {
-            try callJSMethod(ext, fn: "show_ui", arguments: [])
+        window.isOpaque = false
+        window.backgroundColor = NSColor.clear
+        window.ignoresMouseEvents = false
+
+        func dumpChildren(view: NSView, indent: String) {
+            NSLog("\(indent)view \(view) @ \(view.frame)")
+            view.subviews.reversed().forEach { (view) in
+                dumpChildren(view: view, indent: indent+"  ")
+            }
         }
+        dumpChildren(view: contentView, indent: "")
+        NSApp.activate(ignoringOtherApps: true)
+        NSLog("app activated")
+        window.makeKeyAndOrderFront(appDelegate)
+        NSLog("window: key and ordered front, FR = \(String(describing: window.firstResponder))")
+
+        // prevent autorelease, double-release
+        self.window = window
+        window.isReleasedWhenClosed = false
+    }
+    
+    func action(_ name: String) -> Void {
+        logException(desc: name) {
+            try Sys.callJS(windowActions.objectForKeyedSubscript(name), arguments: [])
+        }
+    }
+    
+    func action(_ name: String, arguments: [Any]) -> Void {
+        NSLog("invoking action \(name)")
+        logException(desc: name) {
+            // this could be cached if I weren't so lazy...
+            let fn = try Sys.callJSMethod(windowActions, fn: name, arguments: arguments)
+            try Sys.callJS(fn, arguments: [])
+        }
+    }
+    
+    func convertCallback<A1>(_ fn: JSValue) -> ((A1) throws -> JSValue) {
+        @discardableResult
+        func f(_ a: A1) throws -> JSValue {
+            return try Sys.callJS(fn, arguments: [a])
+        }
+        return f
     }
 }

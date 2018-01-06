@@ -13,3 +13,6 @@
 [submodule "Carthage/Checkouts/SwiftCairo"]
 	path = Carthage/Checkouts/SwiftCairo
 	url = https://github.com/rhx/SwiftCairo.git
+[submodule "Carthage/Checkouts/CCairo"]
+	path = Carthage/Checkouts/CCairo
+	url = https://github.com/PureSwift/CCairo.git

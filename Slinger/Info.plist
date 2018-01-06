@@ -27,7 +27,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>LSUIElement</key>
-	<string>1</string>
+	<string>NO</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 </dict>

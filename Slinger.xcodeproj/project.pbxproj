@@ -13,6 +13,9 @@
 		9E4866441FF39E36002793EA /* Cairo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866421FF39E35002793EA /* Cairo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9E4866461FF5B9D8002793EA /* AXSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866451FF5B9D7002793EA /* AXSwift.framework */; };
 		9E4866471FF5B9D8002793EA /* AXSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866451FF5B9D7002793EA /* AXSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9E4866491FF5C941002793EA /* ClutterJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4866481FF5C941002793EA /* ClutterJS.swift */; };
+		9E48664B1FF5C98B002793EA /* System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48664A1FF5C98B002793EA /* System.swift */; };
+		9E48664F1FFAFA39002793EA /* Keycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48664E1FFAFA39002793EA /* Keycode.swift */; };
 		9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBE70CC1FE61572002C536F /* AppDelegate.swift */; };
 		9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EBE70CE1FE61572002C536F /* Assets.xcassets */; };
 		9EBE716F1FEE6EF3002C536F /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */; };
@@ -46,6 +49,9 @@
 		9E48663C1FF356FE002793EA /* CairoJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CairoJS.swift; sourceTree = "<group>"; };
 		9E4866421FF39E35002793EA /* Cairo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cairo.framework; path = Carthage/Checkouts/Cairo/build/Debug/Cairo.framework; sourceTree = "<group>"; };
 		9E4866451FF5B9D7002793EA /* AXSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AXSwift.framework; path = Carthage/Build/Mac/AXSwift.framework; sourceTree = "<group>"; };
+		9E4866481FF5C941002793EA /* ClutterJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClutterJS.swift; sourceTree = "<group>"; };
+		9E48664A1FF5C98B002793EA /* System.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = System.swift; sourceTree = "<group>"; };
+		9E48664E1FFAFA39002793EA /* Keycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keycode.swift; sourceTree = "<group>"; };
 		9EBE70C91FE61572002C536F /* Slinger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slinger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EBE70CC1FE61572002C536F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EBE70CE1FE61572002C536F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -107,6 +113,9 @@
 				9EEBC6921FEF4CD200FF72EB /* Slinger.swift */,
 				9EEBC6941FEF4CEC00FF72EB /* Keybinding.swift */,
 				9E48663C1FF356FE002793EA /* CairoJS.swift */,
+				9E4866481FF5C941002793EA /* ClutterJS.swift */,
+				9E48664A1FF5C98B002793EA /* System.swift */,
+				9E48664E1FFAFA39002793EA /* Keycode.swift */,
 			);
 			path = Slinger;
 			sourceTree = "<group>";
@@ -201,8 +210,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E48664F1FFAFA39002793EA /* Keycode.swift in Sources */,
 				9E48663D1FF356FE002793EA /* CairoJS.swift in Sources */,
+				9E48664B1FF5C98B002793EA /* System.swift in Sources */,
 				9EEBC6951FEF4CEC00FF72EB /* Keybinding.swift in Sources */,
+				9E4866491FF5C941002793EA /* ClutterJS.swift in Sources */,
 				9EEBC6931FEF4CD200FF72EB /* Slinger.swift in Sources */,
 				9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */,
 				9EEBC68B1FEF159D00FF72EB /* main.swift in Sources */,
@@ -325,21 +337,28 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Slinger/Slinger.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 63JTN2D3M5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/AXSwift/build/Release",
 					"$(PROJECT_DIR)/Carthage/Checkouts/Cairo/build/Debug",
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/Carthage/Checkouts/Cairo/.build/checkouts/**";
 				INFOPLIST_FILE = Slinger/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/Carthage/Checkouts/Cairo/.build/checkouts/**";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/Carthage/Checkouts/Cairo/.build/checkouts/**",
+					/usr/local/Cellar/cairo/1.14.10/lib/,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.gfxmonk.Slinger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.0;
+				SYSTEM_HEADER_SEARCH_PATHS = /usr/local/Cellar/cairo/1.14.10/include/;
 			};
 			name = Debug;
 		};
@@ -348,19 +367,23 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Slinger/Slinger.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 63JTN2D3M5;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/AXSwift/build/Release",
 					"$(PROJECT_DIR)/Carthage/Checkouts/Cairo/build/Debug",
 				);
 				INFOPLIST_FILE = Slinger/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.gfxmonk.Slinger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.0;
+				SYSTEM_HEADER_SEARCH_PATHS = /usr/local/Cellar/cairo/1.14.10/include/;
 			};
 			name = Release;
 		};
