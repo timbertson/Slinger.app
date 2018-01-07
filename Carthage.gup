@@ -1,0 +1,9 @@
+#!bash -eux
+gup --leave
+carthage checkout
+
+pushd "Carthage/Checkouts/Cairo"
+	swift package generate-xcodeproj
+popd
+
+carthage build

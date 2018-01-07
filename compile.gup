@@ -1,0 +1,10 @@
+#!bash -eux
+tsc="$(which tsc 2>/dev/null || true)"
+js_target=slinger-js/extension/cocoa_impl.js
+if [ -z "$tsc" ]; then
+	nix-shell -p nodePackages.typescript --run "gup -u $js_target"
+else
+	gup -u "$js_target"
+fi
+gup -u Carthage
+gup -u build/release/Slinger.app
