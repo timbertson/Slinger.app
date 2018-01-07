@@ -1,3 +1,5 @@
 xcuserdata/
 /Carthage/builds/
 /Carthage/
+*.xcconfig
+/build/

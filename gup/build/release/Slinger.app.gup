@@ -1,4 +1,0 @@
-#!bash -eux
-cd ../../
-gup --leave
-xcodebuild -project Slinger.xcodeproj

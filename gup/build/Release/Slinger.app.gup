@@ -1,0 +1,5 @@
+#!bash -eux
+cd ../../
+gup -u Slinger.xcconfig
+gup --leave
+xcodebuild -project Slinger.xcodeproj -configuration Debug
