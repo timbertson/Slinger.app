@@ -1,5 +1,20 @@
-#!bash -eu
+#!bash -eux
 cd ../../
-gup -u slinger-js/extension/cocoa_impl.js
+tsc="$(which tsc 2>/dev/null || true)"
+js_target=slinger-js/extension/cocoa_impl.js
+if [ -z "$tsc" ]; then
+	nix-shell -p nodePackages.typescript --run "gup -u $js_target"
+else
+	gup -u "$js_target"
+fi
+# carthage update
+pushd Carthage/Checkouts/Cairo
+	swift package generate-xcodeproj
+	xcodebuild --target Cairo
+	find build/
+	# TODO: pretend carthage built it for consistency
+	# cp build/
+popd
+carthage build
 xcodebuild -project Slinger.xcodeproj
 gup --leave

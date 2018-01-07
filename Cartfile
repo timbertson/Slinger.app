@@ -1,3 +1,3 @@
-github "https://github.com/tmandry/AXSwift"
-github "https://github.com/shpakovski/MASShortcut"
-github "https://github.com/PureSwift/Cairo"
+github "tmandry/AXSwift" "fix-xcode-build"
+github "shpakovski/MASShortcut"
+github "timbertson/Cairo" "slinger"
