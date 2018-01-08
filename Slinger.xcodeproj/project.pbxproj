@@ -17,6 +17,10 @@
 		9E4866582002CB5E002793EA /* Slinger.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9E4866572002CB5E002793EA /* Slinger.xcconfig */; };
 		9E48665B2002D2EA002793EA /* Cairo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E48665A2002D2EA002793EA /* Cairo.framework */; };
 		9E48665C2002D2EA002793EA /* Cairo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E48665A2002D2EA002793EA /* Cairo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9E48665E20036F2A002793EA /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48665D20036F2A002793EA /* Status.swift */; };
+		9E48666220037D86002793EA /* icon-black.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666120037D86002793EA /* icon-black.png */; };
+		9E48666420037DE8002793EA /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666320037DE7002793EA /* icon.png */; };
+		9E4866662003813C002793EA /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 9E4866652003813B002793EA /* icon.svg */; };
 		9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBE70CC1FE61572002C536F /* AppDelegate.swift */; };
 		9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EBE70CE1FE61572002C536F /* Assets.xcassets */; };
 		9EBE716F1FEE6EF3002C536F /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */; };
@@ -53,6 +57,10 @@
 		9E48664E1FFAFA39002793EA /* Keycode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keycode.swift; sourceTree = "<group>"; };
 		9E4866572002CB5E002793EA /* Slinger.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Slinger.xcconfig; sourceTree = "<group>"; };
 		9E48665A2002D2EA002793EA /* Cairo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cairo.framework; path = Carthage/Build/Mac/Cairo.framework; sourceTree = "<group>"; };
+		9E48665D20036F2A002793EA /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		9E48666120037D86002793EA /* icon-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-black.png"; path = "slinger-js/img/icon-black.png"; sourceTree = SOURCE_ROOT; };
+		9E48666320037DE7002793EA /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = "slinger-js/img/icon.png"; sourceTree = SOURCE_ROOT; };
+		9E4866652003813B002793EA /* icon.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = icon.svg; path = "slinger-js/img/icon.svg"; sourceTree = SOURCE_ROOT; };
 		9EBE70C91FE61572002C536F /* Slinger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slinger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EBE70CC1FE61572002C536F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EBE70CE1FE61572002C536F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -105,6 +113,9 @@
 		9EBE70CB1FE61572002C536F /* Slinger */ = {
 			isa = PBXGroup;
 			children = (
+				9E4866652003813B002793EA /* icon.svg */,
+				9E48666320037DE7002793EA /* icon.png */,
+				9E48666120037D86002793EA /* icon-black.png */,
 				9EBE70CC1FE61572002C536F /* AppDelegate.swift */,
 				9EBE70CE1FE61572002C536F /* Assets.xcassets */,
 				9EBE70D31FE61572002C536F /* Info.plist */,
@@ -116,6 +127,7 @@
 				9E4866481FF5C941002793EA /* ClutterJS.swift */,
 				9E48664A1FF5C98B002793EA /* System.swift */,
 				9E48664E1FFAFA39002793EA /* Keycode.swift */,
+				9E48665D20036F2A002793EA /* Status.swift */,
 			);
 			path = Slinger;
 			sourceTree = "<group>";
@@ -199,6 +211,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E48666220037D86002793EA /* icon-black.png in Resources */,
+				9E4866662003813C002793EA /* icon.svg in Resources */,
+				9E48666420037DE8002793EA /* icon.png in Resources */,
 				9E4866582002CB5E002793EA /* Slinger.xcconfig in Resources */,
 				9E4866371FEF952A002793EA /* cocoa_impl.js in Resources */,
 				9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */,
@@ -217,6 +232,7 @@
 				9E48664B1FF5C98B002793EA /* System.swift in Sources */,
 				9EEBC6951FEF4CEC00FF72EB /* Keybinding.swift in Sources */,
 				9E4866491FF5C941002793EA /* ClutterJS.swift in Sources */,
+				9E48665E20036F2A002793EA /* Status.swift in Sources */,
 				9EEBC6931FEF4CD200FF72EB /* Slinger.swift in Sources */,
 				9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */,
 				9EEBC68B1FEF159D00FF72EB /* main.swift in Sources */,

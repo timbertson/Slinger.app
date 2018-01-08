@@ -5,7 +5,10 @@ import AXSwift
 
 class ApplicationDelegate: NSObject, NSApplicationDelegate {
     
+    private var status: Status?
+    
     func applicationWillTerminate(_ notification: Notification) {
+        status = nil
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -75,7 +78,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
         
         bind(action: "distribute", key: "8", modifiers: [.option, .shift])
         
-        NSLog("Slinger initialized")
+        status = Status.init()
         
+        NSLog("Slinger initialized")
     }
 }

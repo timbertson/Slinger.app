@@ -1,5 +1,6 @@
 #!bash -eux
+configuration="$(basename "$(dirname "$(pwd)")")"
 cd ../../
 gup -u Slinger.xcconfig
 gup --leave
-xcodebuild -project Slinger.xcodeproj -configuration Debug
+xcodebuild -project Slinger.xcodeproj -configuration "$configuration"
