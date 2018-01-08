@@ -121,10 +121,10 @@ class CocoaSystem: NSObject, SystemExport {
     private let previousSizeCacheMax = 10
     private let ec: DispatchQueue
     
-    init(_ ctx: JSContext) {
+    init(_ ctx: JSContext, dispatchQueue: DispatchQueue) {
         self.ctx = ctx
         self.previousSizeCache = []
-        self.ec = DispatchQueue.global(qos: .userInteractive)
+        self.ec = dispatchQueue
         super.init()
         ctx.exceptionHandler = { context, exception in
             self.jsError = exception
@@ -160,11 +160,11 @@ class CocoaSystem: NSObject, SystemExport {
     }
     
     func moveResizeNS(_ win: WindowRef, pos: NSPoint, size: NSSize) {
-        ec.async { logException(desc: "moveResize") {
+        logException(desc: "moveResize") {
             try win.win.setAttribute(.size, value: size)
             try win.win.setAttribute(.position, value: pos)
             try win.win.setAttribute(.size, value: size)
-        }}
+        }
     }
     
     func workspaceArea(_ win: WindowRef) -> RectExport? {
@@ -329,7 +329,7 @@ class CocoaSystem: NSObject, SystemExport {
     }
     
     func activate(_ win: WindowRef) {
-        ec.async { logException(desc: "activate") {
+        logException(desc: "activate") {
             let pid = try win.win.pid()
             guard let app: NSRunningApplication = NSRunningApplication.init(processIdentifier: pid) else {
                 NSLog("Unable to get app \(pid)")
@@ -344,7 +344,7 @@ class CocoaSystem: NSObject, SystemExport {
             
             NSLog("Activating window of app \(win.app)")
             try win.win.setAttribute(Attribute.main, value: true)
-        }}
+        }
     }
     
     func minimize(_ win: WindowRef) {

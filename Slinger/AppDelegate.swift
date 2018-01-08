@@ -19,47 +19,55 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
             return
         }
         
-        let slinger = try! Slinger.init()
+        let dispatchQueue = DispatchQueue.global(qos: .userInteractive)
+        
+        let slinger = try! Slinger.init(dispatchQueue: dispatchQueue)
         
         let keycodeMap = Keybinding.constructKeyCodeMap()
         MASShortcutValidator.shared().allowAnyShortcutWithOptionModifier = true
         
-        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, fn: @escaping (() -> ())) {
+        let status = Status.init(dispatchQueue: dispatchQueue)
+        
+        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, slow: Bool, fn: @escaping (() -> ())) {
             let prefKey = "shortcut-\(pref)"
             if let keycodes = keycodeMap[key], !keycodes.isEmpty {
                 let shortcut = MASShortcut(keyCode: UInt(keycodes[0]), modifierFlags: modifiers.rawValue)
                 MASShortcutBinder.shared().registerDefaultShortcuts([ prefKey: shortcut as Any ])
-                MASShortcutBinder.shared().bindShortcut(withDefaultsKey: prefKey, toAction: fn)
+                var action = fn
+                if slow {
+                    action = { () in status.asyncWithBusyIndicator(fn) }
+                }
+                MASShortcutBinder.shared().bindShortcut(withDefaultsKey: prefKey, toAction: action)
             }
         }
         
-        func bind(action: String, key: String, modifiers: NSEvent.ModifierFlags) {
-            bind(action, key: key, modifiers: modifiers) { slinger.action(action) }
+        func bind(action: String, key: String, modifiers: NSEvent.ModifierFlags, slow: Bool) {
+            bind(action, key: key, modifiers: modifiers, slow: slow) { slinger.action(action) }
         }
         
-        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, action: String, arguments: [Any]) {
-            bind(pref, key: key, modifiers: modifiers) { slinger.action(action, arguments: arguments) }
+        func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, action: String, arguments: [Any], slow: Bool) {
+            bind(pref, key: key, modifiers: modifiers, slow: slow) { slinger.action(action, arguments: arguments) }
         }
 
-        bind("show", key: "a", modifiers: [.option]) { slinger.show(self) }
-        bind("nextWindow", key: "j", modifiers: [.command], action: "selectWindow", arguments: [1])
-        bind("prevWindow", key: "k", modifiers: [.command], action: "selectWindow", arguments: [-1])
+        bind("show", key: "a", modifiers: [.option], slow: false) { slinger.show(self) }
+        bind("nextWindow", key: "j", modifiers: [.command], action: "selectWindow", arguments: [1], slow: true)
+        bind("prevWindow", key: "k", modifiers: [.command], action: "selectWindow", arguments: [-1], slow: true)
         
-        bind("swapNextWindow", key: "j", modifiers: [.command, .shift], action: "swapWindow", arguments: [1])
-        bind("swapPrevWindow", key: "k", modifiers: [.command, .shift], action: "swapWindow", arguments: [-1])
+        bind("swapNextWindow", key: "j", modifiers: [.command, .shift], action: "swapWindow", arguments: [1], slow: true)
+        bind("swapPrevWindow", key: "k", modifiers: [.command, .shift], action: "swapWindow", arguments: [-1], slow: true)
         
-        bind("moveRight", key: "l", modifiers: [.option], action: "moveAction", arguments: [1, "x"])
-        bind("moveLeft", key: "h", modifiers: [.option], action: "moveAction", arguments: [-1, "x"])
-        bind("moveUp", key: "i", modifiers: [.option], action: "moveAction", arguments: [-1, "y"])
-        bind("moveDown", key: "u", modifiers: [.option], action: "moveAction", arguments: [1, "y"])
+        bind("moveRight", key: "l", modifiers: [.option], action: "moveAction", arguments: [1, "x"], slow: false)
+        bind("moveLeft", key: "h", modifiers: [.option], action: "moveAction", arguments: [-1, "x"], slow: false)
+        bind("moveUp", key: "i", modifiers: [.option], action: "moveAction", arguments: [-1, "y"], slow: false)
+        bind("moveDown", key: "u", modifiers: [.option], action: "moveAction", arguments: [1, "y"], slow: false)
 
-        bind("growHorizontal", key: "l", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "x"])
-        bind("shrinkHorizontal", key: "h", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "x"])
-        bind("growVertical", key: "i", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "y"])
-        bind("shrinkVertical", key: "u", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "y"])
+        bind("growHorizontal", key: "l", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "x"], slow: false)
+        bind("shrinkHorizontal", key: "h", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "x"], slow: false)
+        bind("growVertical", key: "i", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "y"], slow: false)
+        bind("shrinkVertical", key: "u", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "y"], slow: false)
         
-        bind("grow", key: "=", modifiers: [.option], action: "resizeAction", arguments: [1, NSNull.init()])
-        bind("shrink", key: "-", modifiers: [.option], action: "resizeAction", arguments: [-1, NSNull.init()])
+        bind("grow", key: "=", modifiers: [.option], action: "resizeAction", arguments: [1, NSNull.init()], slow: false)
+        bind("shrink", key: "-", modifiers: [.option], action: "resizeAction", arguments: [-1, NSNull.init()], slow: false)
 
         /*
         Not implemented on OSX:
@@ -72,14 +80,14 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
         bind("moveWindowWorkspaceRight", key: "-", modifiers: [.option, .command, .shift], action: "moveWindowWorkspace", arguments: [1])
         */
         
-        bind(action: "toggleMaximize", key: "z", modifiers: [.option])
-        bind(action: "minimize", key: "x", modifiers: [.option])
-        bind(action: "unminimize", key: "x", modifiers: [.option, .shift])
+        bind(action: "toggleMaximize", key: "z", modifiers: [.option], slow: false)
+        bind(action: "minimize", key: "x", modifiers: [.option], slow: false)
+        bind(action: "unminimize", key: "x", modifiers: [.option, .shift], slow: false)
         
-        bind(action: "distribute", key: "8", modifiers: [.option, .shift])
-        
-        status = Status.init()
-        
+        bind(action: "distribute", key: "8", modifiers: [.option, .shift], slow: true)
+
         NSLog("Slinger initialized")
+        status.ready()
+        self.status = status
     }
 }

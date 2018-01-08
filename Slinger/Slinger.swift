@@ -54,11 +54,11 @@ class Slinger {
     private let Sys: CocoaSystem
     private var window: NSWindow?
 
-    init() throws {
+    init(dispatchQueue: DispatchQueue) throws {
         let vm = JSVirtualMachine()
         ctx = JSContext(virtualMachine: vm)!
         ext = JSValue.init(nullIn: ctx)
-        Sys = CocoaSystem.init(ctx)
+        Sys = CocoaSystem.init(ctx, dispatchQueue: dispatchQueue)
         
         let log: @convention(block) (String) -> Void = { msg in
             NSLog(msg)
