@@ -78,9 +78,26 @@ extension NSRect {
 class WindowRef : NSObject {
     let app: NSRunningApplication
     let win: UIElement
+    private var lastKnownFrame: NSRect?
+    
     init(app: NSRunningApplication, win: UIElement) {
         self.app = app
         self.win = win
+    }
+    
+    // because WindowRefs are stateless (i.e. not persisted between slinger actions), we can
+    // get away with never invalidating the rect once we've accessed it
+    func frame() -> NSRect? {
+        if lastKnownFrame == nil {
+            lastKnownFrame = logExceptionOpt(desc: "window.frame") {
+                try (win.attribute(.frame) as NSValue?)?.rectValue
+            }
+        }
+        return lastKnownFrame
+    }
+    
+    func frameIfCached() -> NSRect? {
+        return lastKnownFrame
     }
 }
 
@@ -154,6 +171,31 @@ class CocoaSystem: NSObject, SystemExport {
         return try captureJSError(obj.invokeMethod(fn, withArguments: arguments))
     }
     
+    private func areaOf(size: NSSize) -> Int {
+        return Int(size.width) * Int(size.height)
+    }
+    
+    private func screenOf(windowFrame: NSRect?) -> NSScreen? {
+        guard let windowFrame = windowFrame else {
+            return nil
+        }
+
+        var bestMatch: NSScreen? = nil
+        var bestVolume: Int = 0
+        
+        NSScreen.screens.forEach { screen in
+            let intersection = screen.frame.intersection(windowFrame).size
+            NSLog("window \(windowFrame) vs screen \(screen.visibleFrame) :: \(intersection)")
+            let volume = areaOf(size: intersection)
+            if (volume > bestVolume) {
+                bestVolume = volume
+                bestMatch = screen
+            }
+        }
+        NSLog("window \(windowFrame) is on screen \(String(describing: bestMatch))")
+        return bestMatch
+    }
+    
     func moveResize(_ win: WindowRef, _ jsrect: JSValue) {
         let rect = Rect.ofJS(jsrect)
         moveResizeNS(win, pos: NSPoint.from(rect.pos), size: NSSize.from(rect.size))
@@ -183,7 +225,7 @@ class CocoaSystem: NSObject, SystemExport {
         while(previousSizeCache.count > previousSizeCacheMax) {
             previousSizeCache.removeFirst()
         }
-        if let frame = windowRectNS(win) {
+        if let frame = win.frame() {
             previousSizeCache.append((pid: win.app.processIdentifier, frame: frame))
         }
     }
@@ -224,14 +266,11 @@ class CocoaSystem: NSObject, SystemExport {
         }
         
         guard let workspaceRect = workspaceAreaNS() else { return false }
-        guard let windowRect = windowRectNS(win) else { return false }
+        guard let windowRect = win.frame() else { return false }
         
         // this is a bit loose, but mostly works
-        func area(_ s: NSSize) -> Int {
-            return Int(s.width) * Int(s.height)
-        }
-        let workspaceArea = area(workspaceRect.size)
-        let windowArea = area(windowRect.size)
+        let workspaceArea = areaOf(size: workspaceRect.size)
+        let windowArea = areaOf(size: windowRect.size)
         let tolerance = Int(0.05 * Double(workspaceArea))
         let difference = abs(workspaceArea - windowArea)
         
@@ -246,10 +285,12 @@ class CocoaSystem: NSObject, SystemExport {
     
     private func isNormalWindow(_ win: UIElement) -> Bool {
         do {
-            if let subrole = try win.attribute(.subrole) as String? {
-                return subrole == kAXStandardWindowSubrole
+            if let role = try win.attribute(.role) as String?, role != kAXWindowRole {
+                return false
             }
-            // no subrole attribute: assume normal
+            if let subrole = try win.attribute(.subrole) as String?, subrole != kAXStandardWindowSubrole {
+                return false
+            }
             return true
         } catch {
             return false
@@ -266,14 +307,29 @@ class CocoaSystem: NSObject, SystemExport {
         }
     }
     
-    private func windowsFromVisibleApps() -> Array<WindowRef> {
+    private func window(_ window: WindowRef, isOnScreen screen: NSScreen) -> Bool {
+        NSLog("getting screen of \(window)")
+        return screenOf(windowFrame: window.frame()) == screen
+    }
+    
+    private func windowsFromVisibleApps(filter: (WindowRef) throws -> Bool) rethrows -> Array<WindowRef> {
         var result: Array<WindowRef> = []
+        guard let screen = NSScreen.main else {
+            return result
+        }
+        NSLog("getting windows on \(screen)")
         allApplications().forEach { runningApp in
             if !runningApp.isHidden {
                 swallowException {
                     if let app = Application.init(runningApp) {
                         if let windows = try windowsFromApp(app, runningApp: runningApp) {
-                            result.append(contentsOf: windows)
+                            result.append(contentsOf: windows.filter { win in
+                                do {
+                                    return try filter(win) && window(win, isOnScreen: screen)
+                                } catch {
+                                    return false
+                                }
+                            })
                         }
                     }
                 }
@@ -289,7 +345,7 @@ class CocoaSystem: NSObject, SystemExport {
     
     func visibleWindowsTyped() -> (WindowRef?, [WindowRef]) {
         return logException(desc: "visibleWindows") {
-            let visible = try windowsFromVisibleApps().filter { win in try !isMinimized(win) }
+            let visible = try windowsFromVisibleApps(filter: { win in try !isMinimized(win) })
             
             var current: WindowRef? = nil
             if let frontmostApp = NSWorkspace.shared.frontmostApplication {
@@ -308,7 +364,7 @@ class CocoaSystem: NSObject, SystemExport {
     
     func minimizedWindows() -> Array<WindowRef> {
         return logException(desc: "minimizedWindows") {
-            try windowsFromVisibleApps().filter { win in try isMinimized(win) }
+            try windowsFromVisibleApps(filter: { win in try isMinimized(win) })
         } ?? []
     }
     
@@ -342,7 +398,10 @@ class CocoaSystem: NSObject, SystemExport {
                 return
             }
             
-            NSLog("Activating window of app \(win.app)")
+            NSLog("Activating window of app \(win.app) with rect \(String(describing: win.frameIfCached()))")
+            
+//            NSLog("it has role \(try win.win.attribute(.role) as String?) ")            // NOCOMMIT
+//            NSLog("it has subrole \(try win.win.attribute(.subrole) as String?) ")            // NOCOMMIT
             try win.win.setAttribute(Attribute.main, value: true)
         }
     }
@@ -398,15 +457,8 @@ class CocoaSystem: NSObject, SystemExport {
         return nil
     }
     
-    private func windowRectNS(_ w: WindowRef) -> NSRect? {
-        return logExceptionOpt(desc: "frame") {
-            // NSLog("Getting frame attribute from \(w.win)")
-            return try (w.win.attribute(.frame) as NSValue?)?.rectValue
-        }
-    }
-    
     func windowRect(_ w: WindowRef) -> RectExport? {
-        return windowRectNS(w).map(Rect.ofNS)
+        return w.frame().map(Rect.ofNS)
     }
     
     func newClutterColor(_ attrs: JSValue) -> ClutterColorExport {
