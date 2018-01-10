@@ -85,21 +85,30 @@ class Slinger {
     
     func show(_ appDelegate: NSApplicationDelegate) {
         hide()
-        NSLog("Showing")
+        debug(" --- ")
+        debug("*** Showing")
         
         guard let screen = NSScreen.main else {
             NSLog("unable to get main screen")
             return
         }
         Sys.screen = screen
-        let origin = Point.ofNS(point: screen.invertYAxis(point: NSEvent.mouseLocation))
+        let primaryScreen = NSScreen.primaryScreen()
+        
+        let mouseLocation = GPoint<Cocoa,Global>(ns: NSEvent.mouseLocation)
+        let screenLocation = mouseLocation.move(screen.globalToScreenOffset())
+        let workspaceLocation = screenLocation.move(screen.screenToWorkspaceOffset())
+        let gnomeLocation = workspaceLocation.invert(from: screen.workspaceSize().cocoa)
+
         let contentView = ClutterView.init()
         let parent = Actor.init(Sys: self.Sys, view: contentView)
+        debug("menu origin = \(gnomeLocation)")
+        
         let window = SlingerWindow.init(contentRect: screen.visibleFrame, styleMask: [.borderless], backing: .buffered, defer: false)
         window.contentView = contentView
         
         let ui : JSValue? = logException(desc: "show") {
-            try Sys.callJSMethod(ext, fn: "show_ui", arguments: [parent, origin])
+            try Sys.callJSMethod(ext, fn: "show_ui", arguments: [parent, Point.ofNS(point: gnomeLocation)])
         }?.nonNull()
         guard let _ = ui?.toObject() else {
             NSLog("no menu created")
@@ -110,6 +119,7 @@ class Slinger {
         window.backgroundColor = NSColor.clear
         window.ignoresMouseEvents = false
 
+#if DEBUG
         func dumpChildren(view: NSView, indent: String) {
             NSLog("\(indent)view \(view) @ \(view.frame)")
             view.subviews.reversed().forEach { (view) in
@@ -117,6 +127,8 @@ class Slinger {
             }
         }
         dumpChildren(view: contentView, indent: "")
+#endif
+
         NSApp.activate(ignoringOtherApps: true)
         NSLog("app activated")
         window.makeKeyAndOrderFront(appDelegate)

@@ -32,6 +32,10 @@ class ClutterView : NSView {
         return true
     }
     
+    override var isFlipped: Bool {
+        get { return true }
+    }
+    
     private func invokeHandler(_ fn: ((NSEvent) -> ())?, _ event: NSEvent) -> Bool {
         // NSLog("invoking handler \(String(describing: fn)) for event \(event)")
         if let handler = fn {
@@ -175,17 +179,8 @@ class Actor: NSObject, ActorExport {
     }
     
     func set_position(_ x: NSNumber, _ y: NSNumber) {
-        // In quartz coordinates, Y (and height) need to be inverted
-        var y = y.intValue
-        if let size = explicitSize {
-            y += Int(size.height)
-        } else {
-            NSLog("WARN: set_position() called without explicit size")
-        }
-        let point = NSPoint.init(
-            x: x.intValue,
-            y: Sys.screen.invertYAxis(y: y))
-        // NSLog("set position \(point) of \(view) based on current size \(String(describing: explicitSize))")
+        let point = NSPoint.init(x: x.intValue, y: y.intValue)
+        debug("set position \(point) of \(view)")
         view.setFrameOrigin(point)
         view.invalidate()
     }
@@ -193,20 +188,20 @@ class Actor: NSObject, ActorExport {
     func set_size(_ x: NSNumber, _ y: NSNumber) {
         let size = NSSize.init(width: x.intValue, height: y.intValue)
         explicitSize = size
-        // NSLog("set size \(size) of \(view)")
+        debug("set size \(size) of \(view)")
         view.setFrameSize(size)
         view.invalidate()
     }
     
     func add_actor(_ a: ActorExport) {
-        NSLog("adding view \(a.view) to \(view)")
+        debug("adding view \(a.view) to \(view)")
         view.addSubview(a.view)
         (a as! Actor).autosizeToParent()
     }
     
     func insert_child_above(_ a: ActorExport, _ targetNullable: ActorExport?) {
         let targetView = targetNullable?.nonNull()?.view
-        NSLog("adding view \(a.view) above \(String(describing: targetView)) on \(view)")
+        debug("adding view \(a.view) above \(String(describing: targetView)) on \(view)")
         view.addSubview(a.view, positioned: .above, relativeTo: targetView)
         (a as! Actor).autosizeToParent()
     }
@@ -214,7 +209,7 @@ class Actor: NSObject, ActorExport {
     func remove_child(_ a: ActorExport) {
         if let win = a.view.window {
             if (a.view.superview == win.contentView) {
-                NSLog("removing toplevel view; closing window")
+                debug("removing toplevel view; closing window")
                 win.close()
                 return
             }
@@ -271,10 +266,6 @@ class Actor: NSObject, ActorExport {
 
 class CairoView : ClutterView {
     var onDraw: ((_: CairoContextExport) throws -> ())?
-    override var isFlipped: Bool {
-        get { return true }
-    }
-    
     override var isOpaque: Bool {
         get { return false }
     }
@@ -344,9 +335,13 @@ class ClutterMouseEvent : NSObject, ClutterMouseEventExport {
         self.y = y
     }
     
+    convenience init(point: GPoint<Gnome,Workspace>) {
+        self.init(x: Int(point.ns.x), y: Int(point.ns.y))
+    }
+    
     static func fromNS(screen: NSScreen, _ event: NSEvent) -> ClutterMouseEvent {
-        let point = screen.invertYAxis(point: event.locationInWindow)
-        return ClutterMouseEvent.init(x: Int(point.x), y: Int(point.y))
+        let eventPoint: GPoint<Cocoa,Workspace> = GPoint(ns: event.locationInWindow)
+        return ClutterMouseEvent.init(point: eventPoint.invert(from: screen.workspaceSize().cocoa))
     }
 
     func get_coords() -> Array<Int> {

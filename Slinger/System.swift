@@ -2,6 +2,15 @@ import Foundation
 import JavaScriptCore
 import AXSwift
 
+#if DEBUG
+    func debug(_ msg: String) {
+        NSLog("DEBUG: \(msg)")
+    }
+#else
+    func debug(_ msg: @autoclosure () -> String) {
+        // noop
+    }
+#endif
 
 @objc protocol PointExport: JSExport {
     var x: Float { get }
@@ -16,8 +25,8 @@ class Point: NSObject, PointExport {
         self.y = y
     }
     
-    static func ofNS(point: NSPoint) -> Point {
-        return Point.init(x: Float(point.x), y: Float(point.y))
+    static func ofNS(point: GPoint<Gnome,Workspace>) -> Point {
+        return Point.init(x: Float(point.ns.x), y: Float(point.ns.y))
     }
     
     static func ofNS(size: NSSize) -> Point {
@@ -29,19 +38,16 @@ class Point: NSObject, PointExport {
             x: Float(point.objectForKeyedSubscript("x").toNumber().floatValue),
             y: Float(point.objectForKeyedSubscript("y").toNumber().floatValue))
     }
-}
-
-extension NSPoint {
-    static func from(_ point: PointExport) -> NSPoint {
-        return NSPoint.init(x: Int(point.x), y: Int(point.y))
+    
+    func toNSPoint() -> GPoint<Gnome,Workspace> {
+        return GPoint<Gnome,Workspace>(ns: NSPoint.init(x: Int(x), y: Int(y)))
+    }
+    
+    func toNSSize() -> NSSize {
+        return NSSize.init(width: Int(x), height: Int(y))
     }
 }
 
-extension NSSize {
-    static func from(_ point: PointExport) -> NSSize {
-        return NSSize.init(width: Int(point.x), height: Int(point.y))
-    }
-}
 
 @objc protocol RectExport: JSExport {
     var pos: PointExport { get set }
@@ -55,19 +61,23 @@ class Rect: NSObject, RectExport {
         self.pos = pos
         self.size = size
     }
-    static func ofNS(_ r: NSRect) -> Rect {
-        return Rect.init(pos: Point.ofNS(point: r.origin), size: Point.ofNS(size: r.size))
+    static func ofNS(_ r: GRect<Gnome,Workspace>) -> Rect {
+        return Rect.init(
+            pos: Point.ofNS(point: r.origin),
+            size: Point.ofNS(size: r.size)
+        )
     }
+    
     static func ofJS(_ r: JSValue) -> Rect {
         let pos: JSValue = r.objectForKeyedSubscript("pos")
         let size: JSValue = r.objectForKeyedSubscript("size")
         return Rect.init(pos: Point.ofJS(pos), size: Point.ofJS(size))
     }
-}
-
-extension NSRect {
-    static func from(rect: RectExport) -> NSRect {
-        return NSRect.init(x: Int(rect.pos.x), y: Int(rect.pos.y), width: Int(rect.size.x), height: Int(rect.size.y))
+    
+    func toNS() -> GRect<Gnome,Workspace> {
+        let pos = GPoint<Gnome,Workspace>(ns: NSPoint.init(x: Int(self.pos.x), y: Int(self.pos.y)))
+        let size = NSSize.init(width: Int(self.size.x), height: Int(self.size.y))
+        return GRect<Gnome,Workspace>(origin: pos, size: size)
     }
 }
 
@@ -78,7 +88,7 @@ extension NSRect {
 class WindowRef : NSObject {
     let app: NSRunningApplication
     let win: UIElement
-    private var lastKnownFrame: NSRect?
+    private var lastKnownFrame: GRect<Gnome,Global>? // for some reason, AXUIelements share gnome's coordinate system
     
     init(app: NSRunningApplication, win: UIElement) {
         self.app = app
@@ -87,16 +97,18 @@ class WindowRef : NSObject {
     
     // because WindowRefs are stateless (i.e. not persisted between slinger actions), we can
     // get away with never invalidating the rect once we've accessed it
-    func frame() -> NSRect? {
+    func frame() -> GRect<Gnome,Global>? {
         if lastKnownFrame == nil {
             lastKnownFrame = logExceptionOpt(desc: "window.frame") {
-                try (win.attribute(.frame) as NSValue?)?.rectValue
+                try ((win.attribute(.frame) as NSValue?)?.rectValue).map { rect in
+                    GRect(origin: GPoint<Gnome,Global>(ns: rect.origin), size: rect.size)
+                }
             }
         }
         return lastKnownFrame
     }
     
-    func frameIfCached() -> NSRect? {
+    func frameIfCached() -> GRect<Gnome,Global>? {
         return lastKnownFrame
     }
 }
@@ -134,7 +146,7 @@ class CocoaSystem: NSObject, SystemExport {
     var screen: NSScreen!
     private var jsError: JSValue?
     private let ctx: JSContext
-    private var previousSizeCache: [(pid: pid_t, frame: NSRect)] // TODO: track per workspace?
+    private var previousSizeCache: [(pid: pid_t, frame: GRect<Gnome,Global>)] // TODO: track per workspace?
     private let previousSizeCacheMax = 10
     private let ec: DispatchQueue
     
@@ -175,49 +187,59 @@ class CocoaSystem: NSObject, SystemExport {
         return Int(size.width) * Int(size.height)
     }
     
-    private func screenOf(windowFrame: NSRect?) -> NSScreen? {
-        guard let windowFrame = windowFrame else {
+    private func screenOf(windowFrame: GRect<Gnome,Global>?) -> NSScreen? {
+        guard let windowFrame = windowFrame?.invert(from: NSScreen.globalSize().gnome) else {
             return nil
         }
-
+        
         var bestMatch: NSScreen? = nil
         var bestVolume: Int = 0
         
         NSScreen.screens.forEach { screen in
-            let intersection = screen.frame.intersection(windowFrame).size
-            NSLog("window \(windowFrame) vs screen \(screen.visibleFrame) :: \(intersection)")
+            let screenFrame : GRect<Cocoa,Global> = screen.gFrame()
+            let intersection = screenFrame.intersectionSize(windowFrame)
+            debug("window \(windowFrame) vs screen \(screenFrame) :: \(intersection)")
             let volume = areaOf(size: intersection)
             if (volume > bestVolume) {
                 bestVolume = volume
                 bestMatch = screen
             }
         }
-        NSLog("window \(windowFrame) is on screen \(String(describing: bestMatch))")
+        debug("window \(windowFrame) is on screen \(String(describing: bestMatch))")
         return bestMatch
     }
     
     func moveResize(_ win: WindowRef, _ jsrect: JSValue) {
         let rect = Rect.ofJS(jsrect)
-        moveResizeNS(win, pos: NSPoint.from(rect.pos), size: NSSize.from(rect.size))
+        guard let screen = NSScreen.main else {
+            NSLog("moveResize: no main screen")
+            return
+        }
+        let gnomeRect = rect.toNS()
+        let workspaceRect = gnomeRect.invert(from: screen.workspaceSize().gnome)
+        let screenRect = workspaceRect.move(screen.screenToWorkspaceOffset().reverse())
+        let globalRect = screenRect.move(screen.globalToScreenOffset().reverse())
+        moveResizeNS(win, globalRect.invert(from: NSScreen.globalSize().cocoa))
     }
     
-    func moveResizeNS(_ win: WindowRef, pos: NSPoint, size: NSSize) {
-        logException(desc: "moveResize") {
-            try win.win.setAttribute(.size, value: size)
-            try win.win.setAttribute(.position, value: pos)
-            try win.win.setAttribute(.size, value: size)
+    func moveResizeNS(_ win: WindowRef, _ rect: GRect<Gnome,Global>) {
+        logException(desc: "moveResize -> \(rect)") {
+            try win.win.setAttribute(.position, value: rect.origin.ns)
+            try win.win.setAttribute(.size, value: rect.size)
         }
     }
     
+    // XXX make this a size, not a rect
     func workspaceArea(_ win: WindowRef) -> RectExport? {
         if let frame = workspaceAreaNS() {
-            return Rect.ofNS(frame)
+            let psuedoFrame = GRect(origin: GPoint<Gnome,Workspace>(ns: NSPoint.zero), size: frame.size)
+            return Rect.ofNS(psuedoFrame)
         }
         return nil
     }
     
-    func workspaceAreaNS() -> NSRect? {
-        return NSScreen.main?.visibleFrame
+    func workspaceAreaNS() -> GRect<Cocoa,Global>? {
+        return NSScreen.main?.gVisibleFrame()
     }
     
     private func pushPreviousSize(_ win: WindowRef) -> Void {
@@ -230,7 +252,7 @@ class CocoaSystem: NSObject, SystemExport {
         }
     }
     
-    private func popPreviousSize(_ win: WindowRef) -> NSRect? {
+    private func popPreviousSize(_ win: WindowRef) -> GRect<Gnome,Global>? {
         if let idx = previousSizeCache.index(where: { pair in pair.pid == win.app.processIdentifier }) {
             let result = previousSizeCache[idx]
             previousSizeCache.remove(at: idx)
@@ -245,7 +267,7 @@ class CocoaSystem: NSObject, SystemExport {
         // not a real maximize, but nobody likes that anyway
         if let rect = workspaceAreaNS() {
             pushPreviousSize(win)
-            moveResizeNS(win, pos: rect.origin, size: rect.size)
+            moveResizeNS(win, rect.invert(from: NSScreen.globalSize().cocoa))
         }
     }
     
@@ -255,7 +277,7 @@ class CocoaSystem: NSObject, SystemExport {
         }
         if let frame = popPreviousSize(win) {
             NSLog("Restoring previous frame: \(frame)")
-            moveResizeNS(win, pos: frame.origin, size: frame.size)
+            moveResizeNS(win, frame)
         }
     }
     
@@ -275,7 +297,7 @@ class CocoaSystem: NSObject, SystemExport {
         let difference = abs(workspaceArea - windowArea)
         
         let isMaximized = difference < tolerance
-        NSLog("isMaximized: \(isMaximized) ( diff = \(difference), tolerance = \(tolerance) )")
+        debug("isMaximized: \(isMaximized) ( diff = \(difference), tolerance = \(tolerance) )")
         return isMaximized
     }
     
@@ -308,7 +330,7 @@ class CocoaSystem: NSObject, SystemExport {
     }
     
     private func window(_ window: WindowRef, isOnScreen screen: NSScreen) -> Bool {
-        NSLog("getting screen of \(window)")
+        debug("getting screen of \(window)")
         return screenOf(windowFrame: window.frame()) == screen
     }
     
@@ -317,7 +339,7 @@ class CocoaSystem: NSObject, SystemExport {
         guard let screen = NSScreen.main else {
             return result
         }
-        NSLog("getting windows on \(screen)")
+        debug("getting windows on \(screen)")
         allApplications().forEach { runningApp in
             if !runningApp.isHidden {
                 swallowException {
@@ -398,10 +420,7 @@ class CocoaSystem: NSObject, SystemExport {
                 return
             }
             
-            NSLog("Activating window of app \(win.app) with rect \(String(describing: win.frameIfCached()))")
-            
-//            NSLog("it has role \(try win.win.attribute(.role) as String?) ")            // NOCOMMIT
-//            NSLog("it has subrole \(try win.win.attribute(.subrole) as String?) ")            // NOCOMMIT
+            debug("Activating window of app \(win.app) with rect \(String(describing: win.frameIfCached()))")
             try win.win.setAttribute(Attribute.main, value: true)
         }
     }
@@ -458,7 +477,16 @@ class CocoaSystem: NSObject, SystemExport {
     }
     
     func windowRect(_ w: WindowRef) -> RectExport? {
-        return w.frame().map(Rect.ofNS)
+        return w.frame().flatMap { rect in
+            (NSScreen.main).map { screen in
+                // XXX this could definitely be more efficeint
+                let cocoaRect = rect.invert(from: NSScreen.globalSize().gnome)
+                let screenRect = cocoaRect.move(screen.globalToScreenOffset())
+                let workspaceRect = screenRect.move(screen.screenToWorkspaceOffset())
+                let convertedRect = workspaceRect.invert(from: screen.workspaceSize().cocoa)
+                return Rect.ofNS(convertedRect)
+            }
+        }
     }
     
     func newClutterColor(_ attrs: JSValue) -> ClutterColorExport {
@@ -501,16 +529,3 @@ extension JSValue {
     }
 }
 
-extension NSScreen {
-    func invertYAxis(point: NSPoint) -> NSPoint {
-        return NSPoint.init(x: Int(point.x), y: invertYAxis(y: Int(point.y)))
-    }
-    
-    func invertYAxis(y: Int) -> Int {
-        let frame = visibleFrame
-        let screenHeight = Int(frame.size.height)
-        let inverted = (y - Int(screenHeight)) * -1
-//        NSLog("point's y = \(y), in bounds \(screenHeight) at offset \(screenOffset) -> \(inverted)")
-        return inverted
-    }
-}

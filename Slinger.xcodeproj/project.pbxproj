@@ -20,6 +20,7 @@
 		9E48665E20036F2A002793EA /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48665D20036F2A002793EA /* Status.swift */; };
 		9E48666C200389F9002793EA /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666B200389F9002793EA /* icon.png */; };
 		9E48666E20038E30002793EA /* icon-fade.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666D20038E30002793EA /* icon-fade.png */; };
+		9E4866702005F322002793EA /* NSScreen+Slinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48666F2005F322002793EA /* NSScreen+Slinger.swift */; };
 		9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBE70CC1FE61572002C536F /* AppDelegate.swift */; };
 		9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EBE70CE1FE61572002C536F /* Assets.xcassets */; };
 		9EBE716F1FEE6EF3002C536F /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */; };
@@ -59,6 +60,7 @@
 		9E48665D20036F2A002793EA /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 		9E48666B200389F9002793EA /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = "slinger-js/img/icon.png"; sourceTree = SOURCE_ROOT; };
 		9E48666D20038E30002793EA /* icon-fade.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon-fade.png"; path = "slinger-js/img/icon-fade.png"; sourceTree = SOURCE_ROOT; };
+		9E48666F2005F322002793EA /* NSScreen+Slinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+Slinger.swift"; sourceTree = "<group>"; };
 		9EBE70C91FE61572002C536F /* Slinger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Slinger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EBE70CC1FE61572002C536F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EBE70CE1FE61572002C536F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				9E48664A1FF5C98B002793EA /* System.swift */,
 				9E48664E1FFAFA39002793EA /* Keycode.swift */,
 				9E48665D20036F2A002793EA /* Status.swift */,
+				9E48666F2005F322002793EA /* NSScreen+Slinger.swift */,
 			);
 			path = Slinger;
 			sourceTree = "<group>";
@@ -226,6 +229,7 @@
 				9E48664F1FFAFA39002793EA /* Keycode.swift in Sources */,
 				9E48663D1FF356FE002793EA /* CairoJS.swift in Sources */,
 				9E48664B1FF5C98B002793EA /* System.swift in Sources */,
+				9E4866702005F322002793EA /* NSScreen+Slinger.swift in Sources */,
 				9EEBC6951FEF4CEC00FF72EB /* Keybinding.swift in Sources */,
 				9E4866491FF5C941002793EA /* ClutterJS.swift in Sources */,
 				9E48665E20036F2A002793EA /* Status.swift in Sources */,
