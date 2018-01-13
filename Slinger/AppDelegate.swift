@@ -63,8 +63,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
 
         bind("growHorizontal", key: "l", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "x"], slow: false)
         bind("shrinkHorizontal", key: "h", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "x"], slow: false)
-        bind("growVertical", key: "i", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "y"], slow: false)
-        bind("shrinkVertical", key: "u", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "y"], slow: false)
+        bind("growVertical", key: "u", modifiers: [.option, .shift], action: "resizeAction", arguments: [1, "y"], slow: false)
+        bind("shrinkVertical", key: "i", modifiers: [.option, .shift], action: "resizeAction", arguments: [-1, "y"], slow: false)
         
         bind("grow", key: "=", modifiers: [.option], action: "resizeAction", arguments: [1, NSNull.init()], slow: false)
         bind("shrink", key: "-", modifiers: [.option], action: "resizeAction", arguments: [-1, NSNull.init()], slow: false)
