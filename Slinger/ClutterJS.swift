@@ -281,7 +281,10 @@ class CairoView : ClutterView {
 
 class ClutterCanvas : Actor, ClutterCanvasExport {
     init(Sys: CocoaSystem) {
-        super.init(Sys: Sys, view: CairoView.init())
+        let view = CairoView.init()
+        // disabled for now, seems to cause SIGABRT consistently on mouseMove handler
+//        view.wantsLayer = true // enables this view to have transparency overlayed on parent views
+        super.init(Sys: Sys, view: view)
     }
     
     func invalidate() {
