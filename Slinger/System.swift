@@ -117,7 +117,7 @@ class WindowRef : NSObject {
     func currentWindow() -> WindowRef?
     func windowRect(_ w: WindowRef) -> RectExport?
     func moveResize(_ win: WindowRef, _ rect: JSValue) -> ()
-    func workspaceArea(_ win: WindowRef) -> RectExport?
+    func workspaceArea(_ win: WindowRef) -> PointExport?
     func unmaximize(_ win: WindowRef) -> ()
     func maximize(_ win: WindowRef) -> ()
     func getMaximized(_ win: WindowRef) -> Bool
@@ -229,11 +229,9 @@ class CocoaSystem: NSObject, SystemExport {
         }
     }
     
-    // XXX make this a size, not a rect
-    func workspaceArea(_ win: WindowRef) -> RectExport? {
+    func workspaceArea(_ win: WindowRef) -> PointExport? {
         if let frame = workspaceAreaNS() {
-            let psuedoFrame = GRect(origin: GPoint<Gnome,Workspace>(ns: NSPoint.zero), size: frame.size)
-            return Rect.ofNS(psuedoFrame)
+            return Point.ofNS(size: frame.size)
         }
         return nil
     }
