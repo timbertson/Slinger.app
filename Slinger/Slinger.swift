@@ -93,7 +93,6 @@ class Slinger {
             return
         }
         Sys.screen = screen
-        let primaryScreen = NSScreen.primaryScreen()
         
         let mouseLocation = GPoint<Cocoa,Global>(ns: NSEvent.mouseLocation)
         let screenLocation = mouseLocation.move(screen.globalToScreenOffset())

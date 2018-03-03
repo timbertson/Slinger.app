@@ -85,6 +85,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
         bind(action: "unminimize", key: "x", modifiers: [.option, .shift], slow: false)
         
         bind(action: "distribute", key: "8", modifiers: [.option, .shift], slow: true)
+        bind(action: "fillAvailableSpace", key: "8", modifiers: [.option], slow: true)
 
         NSLog("Slinger initialized")
         status.ready()
