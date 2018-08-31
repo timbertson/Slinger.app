@@ -1,5 +1,5 @@
 #!bash -eux
-configuration="$(basename "$(dirname "$(pwd)")")"
+configuration="$(basename "$(pwd)")"
 gup --always
 cd ../../
 gup -u Slinger.xcconfig

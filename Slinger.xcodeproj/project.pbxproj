@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		9E06372D204AA8DD0092BF47 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */; };
-		9E063734204AAEC70092BF47 /* Cairo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E063732204AACAF0092BF47 /* Cairo.framework */; };
-		9E063735204AAEC70092BF47 /* Cairo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E063732204AACAF0092BF47 /* Cairo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9E4866371FEF952A002793EA /* cocoa_impl.js in Resources */ = {isa = PBXBuildFile; fileRef = 9E4866361FEF952A002793EA /* cocoa_impl.js */; };
 		9E48663D1FF356FE002793EA /* CairoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48663C1FF356FE002793EA /* CairoJS.swift */; };
 		9E4866461FF5B9D8002793EA /* AXSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866451FF5B9D7002793EA /* AXSwift.framework */; };
@@ -24,6 +22,8 @@
 		9E4866702005F322002793EA /* NSScreen+Slinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48666F2005F322002793EA /* NSScreen+Slinger.swift */; };
 		9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBE70CC1FE61572002C536F /* AppDelegate.swift */; };
 		9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EBE70CE1FE61572002C536F /* Assets.xcassets */; };
+		9EC6C31921395CFC00C4A82E /* Cairo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC6C31821395CFB00C4A82E /* Cairo.framework */; };
+		9EC6C31A21395CFC00C4A82E /* Cairo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC6C31821395CFB00C4A82E /* Cairo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9EEBC68B1FEF159D00FF72EB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEBC68A1FEF159D00FF72EB /* main.swift */; };
 		9EEBC68F1FEF2A1700FF72EB /* MASShortcut.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */; };
 		9EEBC6901FEF2A1700FF72EB /* MASShortcut.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -39,7 +39,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9E063735204AAEC70092BF47 /* Cairo.framework in Embed Frameworks */,
+				9EC6C31A21395CFC00C4A82E /* Cairo.framework in Embed Frameworks */,
 				9EEBC6901FEF2A1700FF72EB /* MASShortcut.framework in Embed Frameworks */,
 				9E4866471FF5B9D8002793EA /* AXSwift.framework in Embed Frameworks */,
 			);
@@ -67,6 +67,7 @@
 		9EBE70D31FE61572002C536F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EBE70D41FE61572002C536F /* Slinger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slinger.entitlements; sourceTree = "<group>"; };
 		9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
+		9EC6C31821395CFB00C4A82E /* Cairo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cairo.framework; path = Carthage/Build/Mac/Cairo.framework; sourceTree = "<group>"; };
 		9EEBC68A1FEF159D00FF72EB /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MASShortcut.framework; path = Carthage/Build/Mac/MASShortcut.framework; sourceTree = "<group>"; };
 		9EEBC6921FEF4CD200FF72EB /* Slinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slinger.swift; sourceTree = "<group>"; };
@@ -81,7 +82,7 @@
 			files = (
 				9E06372D204AA8DD0092BF47 /* ApplicationServices.framework in Frameworks */,
 				9EEBC6971FEF533600FF72EB /* JavaScriptCore.framework in Frameworks */,
-				9E063734204AAEC70092BF47 /* Cairo.framework in Frameworks */,
+				9EC6C31921395CFC00C4A82E /* Cairo.framework in Frameworks */,
 				9EEBC68F1FEF2A1700FF72EB /* MASShortcut.framework in Frameworks */,
 				9E4866461FF5B9D8002793EA /* AXSwift.framework in Frameworks */,
 			);
@@ -135,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				9E063732204AACAF0092BF47 /* Cairo.framework */,
+				9EC6C31821395CFB00C4A82E /* Cairo.framework */,
 				9E4866451FF5B9D7002793EA /* AXSwift.framework */,
 				9EEBC6961FEF533600FF72EB /* JavaScriptCore.framework */,
 				9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */,

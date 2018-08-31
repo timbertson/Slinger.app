@@ -7,4 +7,4 @@ pushd "Carthage/Checkouts/Cairo"
 	swift package generate-xcodeproj
 popd
 
-carthage build
+carthage build --platform macos
