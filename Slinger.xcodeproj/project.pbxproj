@@ -9,21 +9,18 @@
 /* Begin PBXBuildFile section */
 		9E06372D204AA8DD0092BF47 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */; };
 		9E4866371FEF952A002793EA /* cocoa_impl.js in Resources */ = {isa = PBXBuildFile; fileRef = 9E4866361FEF952A002793EA /* cocoa_impl.js */; };
-		9E48663D1FF356FE002793EA /* CairoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48663C1FF356FE002793EA /* CairoJS.swift */; };
 		9E4866461FF5B9D8002793EA /* AXSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866451FF5B9D7002793EA /* AXSwift.framework */; };
 		9E4866471FF5B9D8002793EA /* AXSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E4866451FF5B9D7002793EA /* AXSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9E4866491FF5C941002793EA /* ClutterJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4866481FF5C941002793EA /* ClutterJS.swift */; };
 		9E48664B1FF5C98B002793EA /* System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48664A1FF5C98B002793EA /* System.swift */; };
 		9E48664F1FFAFA39002793EA /* Keycode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48664E1FFAFA39002793EA /* Keycode.swift */; };
-		9E4866582002CB5E002793EA /* Slinger.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9E4866572002CB5E002793EA /* Slinger.xcconfig */; };
 		9E48665E20036F2A002793EA /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48665D20036F2A002793EA /* Status.swift */; };
 		9E48666C200389F9002793EA /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666B200389F9002793EA /* icon.png */; };
 		9E48666E20038E30002793EA /* icon-fade.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E48666D20038E30002793EA /* icon-fade.png */; };
 		9E4866702005F322002793EA /* NSScreen+Slinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48666F2005F322002793EA /* NSScreen+Slinger.swift */; };
+		9E50B54622A3675C0006209A /* CairoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E48663C1FF356FE002793EA /* CairoJS.swift */; };
 		9EBE70CD1FE61572002C536F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBE70CC1FE61572002C536F /* AppDelegate.swift */; };
 		9EBE70CF1FE61572002C536F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EBE70CE1FE61572002C536F /* Assets.xcassets */; };
-		9EC6C31921395CFC00C4A82E /* Cairo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC6C31821395CFB00C4A82E /* Cairo.framework */; };
-		9EC6C31A21395CFC00C4A82E /* Cairo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC6C31821395CFB00C4A82E /* Cairo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9EEBC68B1FEF159D00FF72EB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEBC68A1FEF159D00FF72EB /* main.swift */; };
 		9EEBC68F1FEF2A1700FF72EB /* MASShortcut.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */; };
 		9EEBC6901FEF2A1700FF72EB /* MASShortcut.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -39,7 +36,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9EC6C31A21395CFC00C4A82E /* Cairo.framework in Embed Frameworks */,
 				9EEBC6901FEF2A1700FF72EB /* MASShortcut.framework in Embed Frameworks */,
 				9E4866471FF5B9D8002793EA /* AXSwift.framework in Embed Frameworks */,
 			);
@@ -49,7 +45,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9E063732204AACAF0092BF47 /* Cairo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cairo.framework; path = Carthage/Checkouts/Cairo/build/Debug/Cairo.framework; sourceTree = "<group>"; };
 		9E4866361FEF952A002793EA /* cocoa_impl.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = cocoa_impl.js; path = "slinger-js/extension/cocoa_impl.js"; sourceTree = "<group>"; };
 		9E48663C1FF356FE002793EA /* CairoJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CairoJS.swift; sourceTree = "<group>"; };
 		9E4866451FF5B9D7002793EA /* AXSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AXSwift.framework; path = Carthage/Build/Mac/AXSwift.framework; sourceTree = "<group>"; };
@@ -67,7 +62,6 @@
 		9EBE70D31FE61572002C536F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EBE70D41FE61572002C536F /* Slinger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Slinger.entitlements; sourceTree = "<group>"; };
 		9EBE716E1FEE6EF3002C536F /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
-		9EC6C31821395CFB00C4A82E /* Cairo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cairo.framework; path = Carthage/Build/Mac/Cairo.framework; sourceTree = "<group>"; };
 		9EEBC68A1FEF159D00FF72EB /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MASShortcut.framework; path = Carthage/Build/Mac/MASShortcut.framework; sourceTree = "<group>"; };
 		9EEBC6921FEF4CD200FF72EB /* Slinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slinger.swift; sourceTree = "<group>"; };
@@ -82,7 +76,6 @@
 			files = (
 				9E06372D204AA8DD0092BF47 /* ApplicationServices.framework in Frameworks */,
 				9EEBC6971FEF533600FF72EB /* JavaScriptCore.framework in Frameworks */,
-				9EC6C31921395CFC00C4A82E /* Cairo.framework in Frameworks */,
 				9EEBC68F1FEF2A1700FF72EB /* MASShortcut.framework in Frameworks */,
 				9E4866461FF5B9D8002793EA /* AXSwift.framework in Frameworks */,
 			);
@@ -135,8 +128,6 @@
 		9EBE70DA1FE61592002C536F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9E063732204AACAF0092BF47 /* Cairo.framework */,
-				9EC6C31821395CFB00C4A82E /* Cairo.framework */,
 				9E4866451FF5B9D7002793EA /* AXSwift.framework */,
 				9EEBC6961FEF533600FF72EB /* JavaScriptCore.framework */,
 				9EEBC68C1FEF286700FF72EB /* MASShortcut.framework */,
@@ -181,7 +172,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Tim Cuthbertson";
 				TargetAttributes = {
 					9EBE70C81FE61572002C536F = {
@@ -213,7 +204,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E4866582002CB5E002793EA /* Slinger.xcconfig in Resources */,
 				9E4866371FEF952A002793EA /* cocoa_impl.js in Resources */,
 				9E48666E20038E30002793EA /* icon-fade.png in Resources */,
 				9E48666C200389F9002793EA /* icon.png in Resources */,
@@ -228,8 +218,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E50B54622A3675C0006209A /* CairoJS.swift in Sources */,
 				9E48664F1FFAFA39002793EA /* Keycode.swift in Sources */,
-				9E48663D1FF356FE002793EA /* CairoJS.swift in Sources */,
 				9E48664B1FF5C98B002793EA /* System.swift in Sources */,
 				9E4866702005F322002793EA /* NSScreen+Slinger.swift in Sources */,
 				9EEBC6951FEF4CEC00FF72EB /* Keybinding.swift in Sources */,
@@ -259,6 +249,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -266,6 +257,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -317,6 +309,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -324,6 +317,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

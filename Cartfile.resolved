@@ -1,3 +1,2 @@
 github "shpakovski/MASShortcut" "2.3.6"
-github "timbertson/Cairo" "80bb3d252c4e40e3a4a0da2dcb330b07e46c6d77"
-github "tmandry/AXSwift" "eb3633fc9fefd5d96029ff11c43009a45f43d5a8"
+github "tmandry/AXSwift" "0.2.3"

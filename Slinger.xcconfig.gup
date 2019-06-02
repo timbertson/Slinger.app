@@ -4,9 +4,9 @@ set -o pipefail
 
 cat > $1 <<EOF
 FRAMEWORK_SEARCH_PATHS = \$(inherited) "\$(PROJECT_DIR)/Carthage/Build/Mac"
-
-HEADER_SEARCH_PATHS = \$(inherited) "\$(SRCROOT)/Carthage/Checkouts/Cairo/.build/checkouts/**"
-SYSTEM_HEADER_SEARCH_PATHS = \$(inherited) "$(pkg-config --variable includedir cairo)"
-
-LIBRARY_SEARCH_PATHS = \$(inherited) "$(pkg-config --variable libdir cairo)"
 EOF
+
+# HEADER_SEARCH_PATHS = \$(inherited) "\$(SRCROOT)/Carthage/Checkouts/Cairo/.build/checkouts/**"
+# SYSTEM_HEADER_SEARCH_PATHS = \$(inherited) "$(pkg-config --variable includedir cairo)"
+#
+# LIBRARY_SEARCH_PATHS = \$(inherited) "$(pkg-config --variable libdir cairo)"

@@ -1,3 +1,4 @@
-github "tmandry/AXSwift" "fix-xcode-build"
+github "tmandry/AXSwift"
+# github "tmandry/Swindler"
 github "shpakovski/MASShortcut"
-github "timbertson/Cairo" "slinger"
+#github "timbertson/Cairo" "slinger"
