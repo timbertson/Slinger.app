@@ -392,6 +392,8 @@ class ClutterKeyEvent : NSObject, ClutterKeyEventExport {
             case Keycode.tab: return 23
             case Keycode.u: return 30
             case Keycode.i: return 31
+            case Keycode.o: return 32
+            case Keycode.a: return 38
             case Keycode.h: return 43
             case Keycode.j: return 44
             case Keycode.k: return 45
