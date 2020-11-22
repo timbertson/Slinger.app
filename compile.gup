@@ -7,6 +7,5 @@ if [ -z "$tsc" ]; then
 else
 	gup -u "$res"
 fi
-# gup -u Carthage
-# gup -u build/release/Slinger.app
-swift build
+env PKG_CONFIG_PATH=(nix-shell -p cairo.dev pkg-config --run 'echo $PKG_CONFIG_PATH_FOR_TARGET') \
+	swift build

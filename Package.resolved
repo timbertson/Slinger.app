@@ -11,12 +11,21 @@
         }
       },
       {
-        "package": "MASShortcut",
-        "repositoryURL": "/Users/tcuthbertson/Code/scratch/MASShortcut",
+        "package": "Cairo",
+        "repositoryURL": "https://github.com/timbertson/Cairo",
         "state": {
           "branch": null,
-          "revision": "2cc9c2566761e47dc495485f8a63c1ba7acf8bce",
-          "version": "2.4.7"
+          "revision": "25fa120cd2eb22fe0608b17e4c8fab2596ad8ead",
+          "version": "1.2.4"
+        }
+      },
+      {
+        "package": "MASShortcut",
+        "repositoryURL": "https://github.com/timbertson/MASShortcut",
+        "state": {
+          "branch": null,
+          "revision": "e9911c78f7d1c06017d5830a5aee875940307ff2",
+          "version": "2.4.8"
         }
       }
     ]

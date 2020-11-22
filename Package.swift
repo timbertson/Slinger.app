@@ -1,25 +1,25 @@
 // swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "Slinger",
-    // products: [
-    //     .executable(name: "Slinger", targets: ["Slinger"]),
-    // ],
     platforms: [
         .macOS(.v10_15),
     ],
+    products: [
+        .executable(name: "Slinger", targets: ["Slinger"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/timbertson/AXSwift", from: "0.2.4"),
-        // .package(url: "https://github.com/rampatra/MASShortcut", from: "2.4.1"),
-        .package(url: "../../scratch/MASShortcut", from: "2.4.7"),
+        .package(url: "https://github.com/timbertson/MASShortcut", from: "2.4.8"),
+        .package(url: "https://github.com/timbertson/Cairo", from: "1.2.4"),
+        // .package(url: "../../scratch/MASShortcut", from: "2.4.7"),
     ],
     targets: [
         .target(
             name: "Slinger",
-            dependencies: ["AXSwift", "MASShortcut"],
+            dependencies: ["AXSwift", "MASShortcut", "Cairo"],
             path: "src",
             exclude: [
                 "res/.gup",
@@ -31,12 +31,5 @@ let package = Package(
                 .copy("res/icon-fade.png"),
             ]
         )
-        // .target(
-        //     name: "Slinger-stubs",
-        //     dependencies: ["AXSwift", "MASShortcut"],
-        //     path: "stub",
-        //     cSettings: [
-        //       .headerSearchPath("Internal"),
-        //     ]),
     ]
 )

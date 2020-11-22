@@ -17,7 +17,7 @@ struct GRect<System: CoordinateSystem, Origin: CoordinateOrigin> {
     func move<DestOrigin>(_ offset: CoordinateOffset<System,Origin,DestOrigin>) -> GRect<System,DestOrigin>
     {
         let newOrigin: GPoint<System,DestOrigin> = origin.move(offset)
-        debug("Moved rect at \(self) by \(offset) -> \(newOrigin)")
+        // debug("Moved rect at \(self) by \(offset) -> \(newOrigin)")
         return GRect<System,DestOrigin>(origin: newOrigin, size: size)
     }
     
@@ -50,7 +50,7 @@ struct GPoint<System: CoordinateSystem, Origin: CoordinateOrigin> {
     
     func move<DestOrigin>(_ offset: CoordinateOffset<System,Origin,DestOrigin>) -> GPoint<System,DestOrigin> {
         let result = GPoint<System,DestOrigin>(x: x - offset.x, y: y - offset.y)
-        debug("Moved point at \(self) by \(offset) -> \(result)")
+        // debug("Moved point at \(self) by \(offset) -> \(result)")
         return result
     }
     
@@ -83,7 +83,7 @@ struct InvertYAxis<Source: CoordinateSystem, Dest:CoordinateSystem, Origin: Coor
     
     func apply(_ source: GPoint<Source,Origin>) -> GPoint<Dest,Origin> {
         let result = GPoint<Dest,Origin>(x: source.x, y: size.y - source.y)
-        debug("inverting point \(source) in coordinate space \(size) -> \(result)")
+        // debug("inverting point \(source) in coordinate space \(size) -> \(result)")
         return result
     }
     
@@ -91,7 +91,7 @@ struct InvertYAxis<Source: CoordinateSystem, Dest:CoordinateSystem, Origin: Coor
         // when inverting a rect, we swap the origin too (i.e. reference from topleft instead of bottomleft)
         let oppositeCorner = GPoint<Source,Origin>(x: source.origin.x, y: source.origin.y + Int(source.size.height))
         let result = GRect(origin: self.apply(oppositeCorner), size: source.size)
-        debug("inverting rect \(source) in coordinate space \(size) -> \(result)")
+        // debug("inverting rect \(source) in coordinate space \(size) -> \(result)")
         return result
     }
     
