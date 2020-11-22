@@ -4,3 +4,4 @@ xcuserdata/
 *.xcconfig
 /build/
 src/res/
+net.gfxmonk.slinger.agent.plist swift-build

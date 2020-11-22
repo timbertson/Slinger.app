@@ -1,0 +1,7 @@
+#!bash -eu
+
+env="PKG_CONFIG_PATH=$(nix-shell -p cairo.dev pkg-config --run 'echo $PKG_CONFIG_PATH_FOR_TARGET'))"
+
+echo '#!/usr/bin/env bash' > "$1"
+echo "env \"$env\" swift build "'"$@"' >> "$1"
+chmod +x "$1"
