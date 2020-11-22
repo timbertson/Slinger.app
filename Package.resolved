@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AXSwift",
+        "repositoryURL": "https://github.com/timbertson/AXSwift",
+        "state": {
+          "branch": null,
+          "revision": "433619272c3fb581743ca5f265d5d29b121e84c7",
+          "version": "0.2.4"
+        }
+      },
+      {
+        "package": "MASShortcut",
+        "repositoryURL": "/Users/tcuthbertson/Code/scratch/MASShortcut",
+        "state": {
+          "branch": null,
+          "revision": "2cc9c2566761e47dc495485f8a63c1ba7acf8bce",
+          "version": "2.4.7"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

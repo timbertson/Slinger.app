@@ -67,7 +67,8 @@ class Slinger {
         // init globals
         ctx.setObject(log, forKeyedSubscript: "log" as NSString)
         
-        let path = Bundle.main.path(forResource: "cocoa_impl", ofType: "js")!
+        // TODO this path seems silly, shouldn't the .bundle be included?
+        let path = Bundle.main.path(forResource: "Slinger_Slinger.bundle/cocoa_impl", ofType: "js")!
         let source = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
 
         ctx.evaluateScript(source)

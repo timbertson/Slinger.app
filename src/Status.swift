@@ -2,11 +2,6 @@
 import Foundation
 import Cocoa
 
-extension NSImage.Name {
-    static let StatusIcon = NSImage.Name("StatusIcon")
-    static let StatusIconBusy = NSImage.Name("StatusIconFaded")
-}
-
 class Status {
     let item: NSStatusItem
     let button: NSButton
@@ -21,15 +16,25 @@ class Status {
         
         item = bar.statusItem(withLength: NSStatusItem.squareLength)
         
-        func makeIcon(_ name: NSImage.Name) -> NSImage {
-            let icon = NSImage.init(named: name)!
+        func makeIcon(_ name: String) -> NSImage {
+            let bundle = Bundle.main
+            let path = bundle.path(forResource: "Slinger_Slinger.bundle/\(name)", ofType: "png")
+            if path == nil {
+                fatalError("Couldn't find image `\(name)`")
+            }
+
+            let iconOpt = NSImage.init(contentsOfFile: path!)
+            if iconOpt == nil {
+                fatalError("Couldn't load image `\(name)`")
+            }
+            let icon = iconOpt!
             icon.isTemplate = true
             icon.size = NSSize.init(width: 18, height: 18)
             return icon
         }
         
-        standardIcon = makeIcon(.StatusIcon)
-        busyIcon = makeIcon(.StatusIconBusy)
+        standardIcon = makeIcon("icon")
+        busyIcon = makeIcon("icon-fade")
         
         button = item.button!
         button.image = busyIcon

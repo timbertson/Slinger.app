@@ -1,5 +1,6 @@
 import Cocoa
 import ApplicationServices
+
 import MASShortcut
 import AXSwift
 
@@ -31,7 +32,7 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
         func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, slow: Bool, fn: @escaping (() -> ())) {
             let prefKey = "shortcut-\(pref)"
             if let keycodes = keycodeMap[key], !keycodes.isEmpty {
-                let shortcut = MASShortcut(keyCode: UInt(keycodes[0]), modifierFlags: modifiers.rawValue)
+                let shortcut = MASShortcut(keyCode: Int(keycodes[0]), modifierFlags: modifiers)
                 MASShortcutBinder.shared().registerDefaultShortcuts([ prefKey: shortcut as Any ])
                 var action = fn
                 if slow {

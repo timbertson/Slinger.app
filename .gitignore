@@ -3,3 +3,4 @@ xcuserdata/
 /Carthage/
 *.xcconfig
 /build/
+src/res/
