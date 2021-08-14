@@ -299,9 +299,13 @@ class CocoaSystem: NSObject, SystemExport {
         debug("isMaximized: \(isMaximized) ( diff = \(difference), tolerance = \(tolerance) )")
         return isMaximized
     }
+
+    private func isVisibleApplication(_ app: NSRunningApplication) -> Bool {
+        return app.activationPolicy == NSApplication.ActivationPolicy.regular && !app.isHidden
+    }
     
-    private func allApplications() -> Array<NSRunningApplication> {
-        return NSWorkspace.shared.runningApplications
+    private func visibleApps() -> Array<NSRunningApplication> {
+        return NSWorkspace.shared.runningApplications.filter(isVisibleApplication)
     }
     
     private func isNormalWindow(_ win: UIElement) -> Bool {
@@ -339,24 +343,34 @@ class CocoaSystem: NSObject, SystemExport {
             return result
         }
         debug("getting windows on \(screen)")
-        allApplications().forEach { runningApp in
+        let apps = visibleApps()
+
+        // Run loop in parallel, because apparently it's embarassingly
+        // slow to access windows of apps :shrug:
+        debug("getting windows from \(apps.count) visible apps")
+        let lock = NSRecursiveLock()
+        DispatchQueue.concurrentPerform(iterations: apps.count) { i in
+            let runningApp = apps[i]
             if !runningApp.isHidden {
                 swallowException {
                     if let app = Application.init(runningApp) {
                         if let windows = try windowsFromApp(app, runningApp: runningApp) {
-                            result.append(contentsOf: windows.filter { win in
+                            let filteredWindows = windows.filter { win in
                                 do {
                                     return try filter(win) && window(win, isOnScreen: screen)
                                 } catch {
                                     return false
                                 }
-                            })
+                            }
+                            lock.lock()
+                            result.append(contentsOf: filteredWindows)
+                            lock.unlock()
                         }
                     }
                 }
             }
         }
-        // NSLog("retrieved \(result.count) windows")
+
         return result
     }
     
@@ -413,14 +427,15 @@ class CocoaSystem: NSObject, SystemExport {
                 return
             }
             
-            let success = app.activate(options: [.activateAllWindows,.activateIgnoringOtherApps])
+            debug("Activating window of app \(win.app) with rect \(String(describing: win.frameIfCached()))")
+            try win.win.setAttribute(Attribute.main, value: true)
+
+            let success = app.activate(options: [.activateIgnoringOtherApps])
             if (!success) {
                 NSLog("NSRunningApplication.activate() failed")
                 return
             }
             
-            debug("Activating window of app \(win.app) with rect \(String(describing: win.frameIfCached()))")
-            try win.win.setAttribute(Attribute.main, value: true)
         }
     }
     

@@ -61,7 +61,7 @@ class Slinger {
         Sys = CocoaSystem.init(ctx, dispatchQueue: dispatchQueue)
         
         let log: @convention(block) (String) -> Void = { msg in
-            NSLog(msg)
+            NSLog("js: \(msg)")
         }
         
         // init globals
