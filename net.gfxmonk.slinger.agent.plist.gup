@@ -8,7 +8,7 @@ cat <<EOF > "$1"
   <dict>
 
     <key>Label</key>
-    <string>net.gfxmonk.slinger.agent.plist</string>
+    <string>net.gfxmonk.slinger.agent</string>
 
     <key>RunAtLoad</key>
     <true/>
