@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "AXSwift",
-        "repositoryURL": "https://github.com/timbertson/AXSwift",
+        "repositoryURL": "https://github.com/tmandry/AXSwift",
         "state": {
           "branch": null,
-          "revision": "433619272c3fb581743ca5f265d5d29b121e84c7",
-          "version": "0.2.4"
+          "revision": "81dcc36aced905d6464cc25e35f8d13184bbf21c",
+          "version": "0.3.2"
         }
       },
       {
@@ -21,11 +21,11 @@
       },
       {
         "package": "MASShortcut",
-        "repositoryURL": "https://github.com/timbertson/MASShortcut",
+        "repositoryURL": "https://github.com/shpakovski/MASShortcut",
         "state": {
           "branch": null,
-          "revision": "e9911c78f7d1c06017d5830a5aee875940307ff2",
-          "version": "2.4.8"
+          "revision": "6ddfd5f866f8f9679b5af656604dd33cc2540a48",
+          "version": null
         }
       }
     ]

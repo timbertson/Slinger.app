@@ -22,16 +22,20 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
       
       let status = Status.init(dispatchQueue: dispatchQueue)
       
+      let binder = MASShortcutBinder.shared()!
+      
       func bind(_ pref: String, key: String, modifiers: NSEvent.ModifierFlags, slow: Bool, fn: @escaping (() -> ())) {
-          let prefKey = "shortcut-\(pref)"
+          // Compiler treats swift String and NSString identically, but using a swift string causes a segfault(!)
+          // https://stackoverflow.com/questions/24208594/swift-string-manipulation-causing-exc-bad-access
+          let prefKey = NSString.init(string: "shortcut-\(pref)")
           if let keycodes = keycodeMap[key], !keycodes.isEmpty {
               let shortcut = MASShortcut(keyCode: Int(keycodes[0]), modifierFlags: modifiers)
-              MASShortcutBinder.shared().registerDefaultShortcuts([ prefKey: shortcut as Any ])
+              binder.registerDefaultShortcuts([ prefKey: shortcut ])
               var action = fn
               if slow {
                   action = { () in status.asyncWithBusyIndicator(fn) }
               }
-              MASShortcutBinder.shared().bindShortcut(withDefaultsKey: prefKey, toAction: action)
+              binder.bindShortcut(withDefaultsKey: prefKey as String, toAction: action)
           }
       }
       
