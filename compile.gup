@@ -7,5 +7,4 @@ if [ -z "$tsc" ]; then
 else
 	gup -u "$res"
 fi
-gup -u ./swift-build
-./swift-build --configuration release
+swift-build --configuration release

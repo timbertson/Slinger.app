@@ -51,8 +51,8 @@ class ApplicationDelegate: NSObject, NSApplicationDelegate {
       bind("nextWindow", key: "j", modifiers: [.command], action: "selectWindow", arguments: [1], slow: true)
       bind("prevWindow", key: "k", modifiers: [.command], action: "selectWindow", arguments: [-1], slow: true)
       
-      bind("swapNextWindow", key: "j", modifiers: [.command, .shift], action: "swapWindow", arguments: [1], slow: true)
-      bind("swapPrevWindow", key: "k", modifiers: [.command, .shift], action: "swapWindow", arguments: [-1], slow: true)
+      // bind("swapNextWindow", key: "j", modifiers: [.command, .shift], action: "swapWindow", arguments: [1], slow: true)
+      // bind("swapPrevWindow", key: "k", modifiers: [.command, .shift], action: "swapWindow", arguments: [-1], slow: true)
       
       bind("moveRight", key: "l", modifiers: [.option], action: "moveAction", arguments: [1, "x"], slow: false)
       bind("moveLeft", key: "h", modifiers: [.option], action: "moveAction", arguments: [-1, "x"], slow: false)
