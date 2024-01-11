@@ -1,6 +1,8 @@
 #!bash -eu
 mkdir -p "$1"
-for f in extension/cocoa_impl.js img/icon.png img/icon-fade.png; do
+pwd
+set -x
+for f in bundle/cocoa_impl.js img/icon.png img/icon-fade.png; do
 	src="../slinger-js/$f"
 	gup -u "$src"
 	cp "$src" "$1/$(basename "$f")"

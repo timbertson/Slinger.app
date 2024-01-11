@@ -65,15 +65,22 @@ class Slinger {
         }
         
         // init globals
+        ctx.setObject(ctx.globalObject, forKeyedSubscript: "window" as NSString)
         ctx.setObject(log, forKeyedSubscript: "log" as NSString)
         
         // TODO this path seems silly, shouldn't the .bundle be included?
         let path = Bundle.main.path(forResource: "Slinger_Slinger.bundle/cocoa_impl", ofType: "js")!
         let source = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
 
-        ctx.evaluateScript(source)
-        ext = try Sys.callJS(ctx.objectForKeyedSubscript("makeExtension"), arguments: [Sys as SystemExport])
-        windowActions = ext.objectForKeyedSubscript("actions")
+        NSLog("Evaluating script")
+        try Sys.evaluateScript(source)
+        NSLog("Making extension")
+        if let makeExtensionFn = ctx.objectForKeyedSubscript("makeExtension") {
+            ext = try Sys.callJS(makeExtensionFn, arguments: [Sys as SystemExport])
+            windowActions = ext.objectForKeyedSubscript("actions")
+        } else {
+            throw RuntimeError.init("makeExtension function not exported; invalid JS bundle")
+        }
     }
     
     func hide() {

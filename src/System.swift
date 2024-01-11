@@ -162,13 +162,22 @@ class CocoaSystem: NSObject, SystemExport {
         }
     }
     
+    @discardableResult
+    func evaluateScript(_ script: String) throws -> JSValue {
+        return try captureJSError(ctx.evaluateScript(script))
+    }
+    
     private func captureJSError(_ result: JSValue?) throws -> JSValue {
         if let error = jsError {
             jsError = nil
-            var desc = String(describing: error)
-            if let stack = error.forProperty("stack") {
-                desc += "\n" + String(describing: stack)
+
+            let lineNumber = error.objectForKeyedSubscript("line")!.toString()
+            let column = error.objectForKeyedSubscript("column")!.toString()
+            var desc = "Captured JS Error @ \(lineNumber ?? "?"):\(column ?? "?"): \(String(describing: error))"
+            if let stack = error.objectForKeyedSubscript("stack") {
+                desc += "\n" + stack.toString()
             }
+
             throw RuntimeError.init(desc)
         }
         return result ?? JSValue.init(undefinedIn: ctx)
