@@ -1,4 +1,7 @@
 with import <nixpkgs> {};
+let
+	impl = callPackage ./slinger-js/nix {};
+in
 mkShell {
 	packages = [
 		cairo.dev
@@ -11,4 +14,5 @@ mkShell {
 		swift
 		swiftpm
 	];
+	JS_BUNDLE_DIR = "${impl}/share/bundle";
 }

@@ -2,8 +2,12 @@
 mkdir -p "$1"
 pwd
 set -x
-for f in bundle/cocoa_impl.js img/icon.png img/icon-fade.png; do
-	src="../slinger-js/$f"
+gup --always
+for src in \
+	"$JS_BUNDLE_DIR/cocoa_impl.js" \
+	../slinger-js/img/icon.png \
+	../slinger-js/img/icon-fade.png \
+; do
 	gup -u "$src"
-	cp "$src" "$1/$(basename "$f")"
+	cp "$src" "$1/$(basename "$src")"
 done
