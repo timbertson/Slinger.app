@@ -66,7 +66,10 @@ class Slinger {
         
         // init globals
         ctx.setObject(ctx.globalObject, forKeyedSubscript: "window" as NSString)
-        ctx.setObject(log, forKeyedSubscript: "log" as NSString)
+
+        let console = JSValue.init(newObjectIn: ctx)
+        console.setValue(log, forProperty: "log" as NSString)
+        ctx.setObject(console, forKeyedSubscript: "console" as NSString)
         
         // TODO this path seems silly, shouldn't the .bundle be included?
         let path = Bundle.main.path(forResource: "Slinger_Slinger.bundle/cocoa_impl", ofType: "js")!
